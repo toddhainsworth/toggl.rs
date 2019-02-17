@@ -1,5 +1,5 @@
 pub struct Session {
-    api_key: String,
+    pub api_key: String,
 }
 
 impl Session {
