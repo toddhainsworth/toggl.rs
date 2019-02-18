@@ -6,15 +6,18 @@ use reqwest::{Client, Response, Result};
 
 use super::session::Session;
 
+const TOGGL_API_BASE: &str = "https://www.toggl.com/api/v8";
+
 #[allow(dead_code)]
 pub fn get(
     session: &Session,
     url: &'static str,
     params: Vec<(&'static str, &'static str)>,
 ) -> Result<Response> {
+    let full_url = get_url(url);
     let client = Client::new();
     client
-        .get(url)
+        .get(&full_url)
         .basic_auth(&session.api_key, Some("api_token"))
         .query(&params)
         .send()
@@ -26,10 +29,15 @@ pub fn post<S>(
     url: &'static str,
     params: HashMap<&str, &str>,
 ) -> Result<Response> {
+    let full_url = get_url(url);
     let client = Client::new();
     client
-        .post(url)
+        .post(&full_url)
         .basic_auth(&session.api_key, Some("api_token"))
         .json(&params)
         .send()
+}
+
+fn get_url(url: &'static str) -> String {
+    format!("{}/{}", TOGGL_API_BASE, url)
 }
