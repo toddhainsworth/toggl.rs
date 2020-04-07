@@ -25,7 +25,7 @@ pub struct User {
     pub language: String,
     pub image_url: String,
     pub sidebar_piechart: bool,
-    pub at: String, // API docs don't detail what this type should be
+    pub at: String,                             // TODO: make me a chrono::DateTime
     pub new_blog_post: HashMap<String, String>, // TODO
     pub send_product_emails: bool,
     pub send_timer_notifications: bool,
