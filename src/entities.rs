@@ -1,9 +1,10 @@
 use super::session::Session;
 
 use std::collections::HashMap;
+use std::fmt::Debug;
 
 // FIXME: I'm not overly fond of this...
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UserData {
     pub since: usize,
     pub data: User,
