@@ -3,6 +3,8 @@ use super::session::Session;
 use std::collections::HashMap;
 use std::fmt::Debug;
 
+use failure::Error;
+
 // FIXME: I'm not overly fond of this...
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UserData {
@@ -60,9 +62,15 @@ impl Default for User {
 }
 
 impl User {
-    pub fn me(session: &Session) -> Result<Self, reqwest::Error> {
-        let mut resp = super::http::get(session, "me", Vec::new())?;
-        let body: UserData = resp.json()?;
+    pub fn me(session: &Session) -> Result<Self, Error> {
+        // TODO: better messaging?
+        let mut resp = super::http::get(session, "me", Vec::new())
+            .map_err(Error::from)
+            .map_err(|e| e.context("Failed to get from the \"me\" API"))?;
+        let body: UserData = resp
+            .json()
+            .map_err(Error::from)
+            .map_err(|e| e.context("Failed to deserialize user data"))?;
         return Ok(body.data);
     }
 }
