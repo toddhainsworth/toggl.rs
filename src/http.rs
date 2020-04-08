@@ -24,11 +24,7 @@ pub fn get(
 }
 
 #[allow(dead_code)]
-pub fn post<S>(
-    session: &Session,
-    url: &'static str,
-    params: HashMap<&str, &str>,
-) -> Result<Response> {
+pub fn post(session: &Session, url: &'static str, params: HashMap<&str, &str>) -> Result<Response> {
     let full_url = get_url(url);
     let client = Client::new();
     client

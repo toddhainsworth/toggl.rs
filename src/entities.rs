@@ -5,9 +5,11 @@ use std::fmt::Debug;
 
 use failure::Error;
 
+// Users ------------------------------------------------------------------------------------;
+
 // FIXME: I'm not overly fond of this...
 #[derive(Serialize, Deserialize, Debug)]
-pub struct UserData {
+struct UserData {
     pub since: usize,
     pub data: User,
 }
@@ -72,5 +74,44 @@ impl User {
             .map_err(Error::from)
             .map_err(|e| e.context("Failed to deserialize user data"))?;
         return Ok(body.data);
+    }
+}
+
+// Clients ------------------------------------------------------------------------------------;
+
+// FIXME: I'm not overly fond of this...
+#[derive(Serialize, Deserialize, Debug)]
+struct ClientData {
+    pub since: usize,
+    pub data: Client,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Client {
+    pub name: String,
+    pub wid: usize,
+    pub notes: Option<String>,
+    pub at: Option<String>,
+}
+
+impl Client {
+    pub fn new(name: &str, wid: usize) -> Self {
+        Client {
+            name: name.to_string(),
+            wid,
+            at: None,
+            notes: None,
+        }
+    }
+}
+
+impl Default for Client {
+    fn default() -> Self {
+        Client {
+            name: String::default(),
+            wid: 0,
+            at: None,
+            notes: None,
+        }
     }
 }
