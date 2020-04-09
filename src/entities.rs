@@ -66,7 +66,7 @@ impl Default for User {
 impl User {
     pub fn me(session: &Session) -> Result<Self, Error> {
         // TODO: better messaging?
-        let mut resp = super::http::get(session, "me", Vec::new())
+        let mut resp = super::http::get(session, "me", vec![("with_related_data", "false")])
             .map_err(Error::from)
             .map_err(|e| e.context("Failed to get from the \"me\" API"))?;
         let body: UserData = resp
@@ -74,6 +74,10 @@ impl User {
             .map_err(Error::from)
             .map_err(|e| e.context("Failed to deserialize user data"))?;
         return Ok(body.data);
+    }
+
+    pub fn save(&self) {
+        unimplemented!()
     }
 }
 
