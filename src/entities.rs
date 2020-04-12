@@ -90,7 +90,6 @@ impl User {
 // FIXME: I'm not overly fond of this...
 #[derive(Serialize, Deserialize, Debug)]
 struct ClientData {
-    pub since: usize,
     pub data: Client,
 }
 
@@ -103,13 +102,26 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn new(name: &str, wid: usize) -> Self {
+    pub fn new(name: &str, wid: usize, at: Option<String>, notes: Option<String>) -> Self {
         Client {
             name: name.to_string(),
             wid,
-            at: None,
-            notes: None,
+            at,
+            notes,
         }
+    }
+
+    // TOOD: Write a test that doesn't hit the API for me :)
+    pub fn get(session: &Session, id: &str) -> Result<Self, Error> {
+        let url = format!("clients/{}", id);
+        let mut resp = super::http::get(&session, url, vec![])
+            .map_err(Error::from)
+            .map_err(|err| err.context(format!("Failed to fetch client with ID {}", id)))?;
+        let body: ClientData = resp
+            .json()
+            .map_err(Error::from)
+            .map_err(|err| err.context("Failed to parse client from JSON"))?;
+        return Ok(body.data);
     }
 }
 
@@ -131,13 +143,13 @@ mod test {
 
     #[test]
     pub fn client_has_name() {
-        let client = Client::new("Cool Client", 1);
+        let client = Client::new("Cool Client", 1, None, None);
         assert!(client.name == "Cool Client");
     }
 
     #[test]
     pub fn client_has_wid() {
-        let client = Client::new("Cool Client", 1);
+        let client = Client::new("Cool Client", 1, None, None);
         assert!(client.wid == 1);
     }
 }
