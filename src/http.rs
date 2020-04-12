@@ -9,11 +9,7 @@ use super::session::Session;
 const TOGGL_API_BASE: &str = "https://www.toggl.com/api/v8";
 
 #[allow(dead_code)]
-pub fn get(
-    session: &Session,
-    url: &'static str,
-    params: Vec<(&'static str, &'static str)>,
-) -> Result<Response> {
+pub fn get(session: &Session, url: String, params: Vec<(String, String)>) -> Result<Response> {
     let full_url = get_url(url);
     let client = Client::new();
     client
@@ -24,7 +20,7 @@ pub fn get(
 }
 
 #[allow(dead_code)]
-pub fn post(session: &Session, url: &'static str, params: HashMap<&str, &str>) -> Result<Response> {
+pub fn post(session: &Session, url: String, params: HashMap<String, String>) -> Result<Response> {
     let full_url = get_url(url);
     let client = Client::new();
     client
@@ -34,6 +30,6 @@ pub fn post(session: &Session, url: &'static str, params: HashMap<&str, &str>) -
         .send()
 }
 
-fn get_url(url: &'static str) -> String {
+fn get_url(url: String) -> String {
     format!("{}/{}", TOGGL_API_BASE, url)
 }

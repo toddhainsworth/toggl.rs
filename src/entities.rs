@@ -66,9 +66,13 @@ impl Default for User {
 impl User {
     pub fn me(session: &Session) -> Result<Self, Error> {
         // TODO: better messaging?
-        let mut resp = super::http::get(session, "me", vec![("with_related_data", "false")])
-            .map_err(Error::from)
-            .map_err(|e| e.context("Failed to get from the \"me\" API"))?;
+        let mut resp = super::http::get(
+            session,
+            "me".to_string(),
+            vec![("with_related_data".to_string(), "false".to_string())],
+        )
+        .map_err(Error::from)
+        .map_err(|e| e.context("Failed to get from the \"me\" API"))?;
         let body: UserData = resp
             .json()
             .map_err(Error::from)
