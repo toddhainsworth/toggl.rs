@@ -123,3 +123,21 @@ impl Default for Client {
         }
     }
 }
+
+// Client tests
+#[cfg(test)]
+mod test {
+    use super::Client;
+
+    #[test]
+    pub fn client_has_name() {
+        let client = Client::new("Cool Client", 1);
+        assert!(client.name == "Cool Client");
+    }
+
+    #[test]
+    pub fn client_has_wid() {
+        let client = Client::new("Cool Client", 1);
+        assert!(client.wid == 1);
+    }
+}
