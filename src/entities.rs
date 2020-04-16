@@ -123,6 +123,13 @@ impl Client {
             .context(format!("Failed to fetch client with ID {}", id))?;
         resp.json().map_err(Error::from)
     }
+
+    pub fn projects(&self, session: &Session) -> Result<Project, Error> {
+        let url = format!("clients/{}/projects", self.id);
+        let mut resp = super::http::get(&session, url, Vec::new())
+            .context("Failed to fetch client projects")?;
+        resp.json().map_err(Error::from)
+    }
 }
 
 impl Default for Client {
@@ -154,3 +161,6 @@ mod test {
         assert!(client.wid == 1);
     }
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Project {}
