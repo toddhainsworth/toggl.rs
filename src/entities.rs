@@ -66,9 +66,13 @@ impl Default for User {
 impl User {
     pub fn me(session: &Session) -> Result<Self, Error> {
         // TODO: better messaging?
-        let mut resp = super::http::get(session, "me", vec![("with_related_data", "false")])
-            .map_err(Error::from)
-            .map_err(|e| e.context("Failed to get from the \"me\" API"))?;
+        let mut resp = super::http::get(
+            session,
+            "me".to_string(),
+            vec![("with_related_data", "false")],
+        )
+        .map_err(Error::from)
+        .map_err(|e| e.context("Failed to get from the \"me\" API"))?;
         let body: UserData = resp
             .json()
             .map_err(Error::from)
@@ -106,6 +110,19 @@ impl Client {
             at: None,
             notes: None,
         }
+    }
+
+    pub fn find(session: &Session, id: usize) -> Result<Self, Error> {
+        let url = format!("clients/{}", id);
+        let mut resp = super::http::get(session, url, Vec::new())
+            .map_err(Error::from)
+            .map_err(|e| e.context(format!("Failed to fetch client with ID: {}", id)))?;
+        let body: ClientData = resp
+            .json()
+            .map_err(Error::from)
+            .map_err(|e| e.context("Failed to deserialize client data"))?;
+
+        return Ok(body.data);
     }
 }
 
