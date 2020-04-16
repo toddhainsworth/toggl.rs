@@ -92,6 +92,7 @@ pub struct Client {
     pub wid: usize,
     pub notes: Option<String>,
     pub at: Option<String>,
+    pub projects: Vec<Project>,
 }
 
 impl Client {
@@ -110,11 +111,14 @@ impl Client {
         resp.json().map_err(Error::from)
     }
 
-    pub fn projects(&self, session: &Session) -> Result<Project, Error> {
-        let url = format!("clients/{}/projects", self.id);
-        let mut resp = super::http::get(&session, url, Vec::new())
-            .context("Failed to fetch client projects")?;
-        resp.json().map_err(Error::from)
+    pub fn projects(&mut self, session: &Session) -> Result<&Vec<Project>, Error> {
+        if self.projects.is_empty() {
+            let url = format!("clients/{}/projects", self.id);
+            let mut resp = super::http::get(&session, url, Vec::new())
+                .context("Failed to fetch client projects")?;
+            self.projects = resp.json()?;
+        }
+        Ok(&self.projects)
     }
 }
 
@@ -126,6 +130,7 @@ impl Default for Client {
             wid: 0,
             at: None,
             notes: None,
+            projects: Vec::new(),
         }
     }
 }
@@ -179,10 +184,12 @@ impl Default for Project {
 
 // Workspaces ------------------------------------------------------------------------;
 
+#[derive(Serialize, Deserialize, Debug)]
 struct WorkspaceData {
     data: Workspace,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Workspace {
     pub id: usize,
     pub name: String,
@@ -215,6 +222,7 @@ impl Default for Workspace {
             rounding_minutes: 15,
             at: None,
             logo_url: None,
+            projects: Vec::new(),
         }
     }
 }
