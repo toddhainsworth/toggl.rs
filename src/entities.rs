@@ -29,7 +29,7 @@ pub struct User {
     pub language: String,
     pub image_url: String,
     pub sidebar_piechart: bool,
-    pub at: String,                             // TODO: make me a chrono::DateTime
+    pub at: Option<String>, // TODO: make me a chrono::DateTime
     pub new_blog_post: HashMap<String, String>, // TODO
     pub send_product_emails: bool,
     pub send_timer_notifications: bool,
@@ -53,7 +53,7 @@ impl Default for User {
             language: String::default(),
             image_url: String::default(),
             sidebar_piechart: false,
-            at: String::default(),
+            at: None,
             new_blog_post: HashMap::new(), // TODO
             send_product_emails: false,
             send_timer_notifications: false,
@@ -89,7 +89,7 @@ struct ClientData {
 pub struct Client {
     pub id: usize,
     pub name: String,
-    pub wid: usize,
+    pub wid: Option<usize>,
     pub notes: Option<String>,
     pub at: Option<String>,
     pub projects: Vec<Project>,
@@ -127,7 +127,7 @@ impl Default for Client {
         Client {
             id: 0,
             name: String::default(),
-            wid: 0,
+            wid: None,
             at: None,
             notes: None,
             projects: Vec::new(),
@@ -144,8 +144,8 @@ struct ProjectData {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Project {
     pub id: usize,
-    pub wid: usize,
-    pub cid: usize,
+    pub wid: Option<usize>,
+    pub cid: Option<usize>,
     pub name: String,
     pub billable: bool,
     pub is_private: bool,
@@ -169,8 +169,8 @@ impl Default for Project {
     fn default() -> Self {
         Project {
             id: 0,
-            wid: 0,
-            cid: 0,
+            wid: None,
+            cid: None,
             name: String::default(),
             billable: false,
             is_private: false,
