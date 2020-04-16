@@ -91,6 +91,7 @@ struct ClientData {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Client {
+    pub id: usize,
     pub name: String,
     pub wid: usize,
     pub notes: Option<String>,
@@ -100,6 +101,7 @@ pub struct Client {
 impl Client {
     pub fn new(name: &str, wid: usize, at: Option<String>, notes: Option<String>) -> Self {
         Client {
+            id: 0,
             name: name.to_string(),
             wid,
             at,
@@ -126,6 +128,7 @@ impl Client {
 impl Default for Client {
     fn default() -> Self {
         Client {
+            id: 0,
             name: String::default(),
             wid: 0,
             at: None,
