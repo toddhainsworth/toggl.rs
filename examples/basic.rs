@@ -9,6 +9,6 @@ fn main() {
 
     println!("{:?}", me);
 
-    let client = Client::get(&session, "id goes here");
-    println!("{:?}", client);
+    let clients = Client::all(&session);
+    println!("{:?}", clients);
 }
