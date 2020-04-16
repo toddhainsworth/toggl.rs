@@ -259,3 +259,24 @@ impl Default for Workspace {
         }
     }
 }
+
+// Time Entries ------------------------------------------------------------------------;
+
+pub struct TimeEntryData {
+    data: TimeEntry,
+}
+
+pub struct TimeEntry {
+    pub description: String,
+    pub wid: usize,
+    pub pid: Option<usize>,
+    pub tid: Option<usize>,
+    pub billable: bool,
+    pub start: String,
+    pub stop: Option<String>,
+    pub duration: usize,
+    pub created_with: String,
+    pub tags: Vec<String>,
+    pub duronly: bool,
+    pub at: Option<String>,
+}
