@@ -176,3 +176,45 @@ impl Default for Project {
         }
     }
 }
+
+// Workspaces ------------------------------------------------------------------------;
+
+struct WorkspaceData {
+    data: Workspace,
+}
+
+pub struct Workspace {
+    pub id: usize,
+    pub name: String,
+    pub premium: bool,
+    pub admin: bool,
+    pub default_hourly_rate: usize,
+    pub default_currency: String,
+    pub only_admins_may_create_projects: bool,
+    pub only_admins_see_billable_rates: bool,
+    pub rounding: usize,
+    pub rounding_minutes: usize,
+    pub at: Option<String>,
+    pub logo_url: Option<String>,
+}
+
+impl Workspace {}
+
+impl Default for Workspace {
+    fn default() -> Self {
+        Workspace {
+            id: 0,
+            name: String::default(),
+            premium: false,
+            admin: false,
+            default_hourly_rate: 0,
+            default_currency: "AUD".to_string(),
+            only_admins_may_create_projects: true,
+            only_admins_see_billable_rates: true,
+            rounding: 1,
+            rounding_minutes: 15,
+            at: None,
+            logo_url: None,
+        }
+    }
+}
