@@ -3,7 +3,7 @@ use super::session::Session;
 use std::collections::HashMap;
 use std::fmt::Debug;
 
-use failure::Error;
+use failure::{Error, ResultExt};
 
 // Users ------------------------------------------------------------------------------------;
 
@@ -71,12 +71,8 @@ impl User {
             "me".to_string(),
             vec![("with_related_data".to_string(), "false".to_string())],
         )
-        .map_err(Error::from)
-        .map_err(|e| e.context("Failed to get from the \"me\" API"))?;
-        let body: UserData = resp
-            .json()
-            .map_err(Error::from)
-            .map_err(|e| e.context("Failed to deserialize user data"))?;
+        .context("Failed to get from the \"me\" API")?;
+        let body: UserData = resp.json().context("Failed to deserialize user data")?;
         return Ok(body.data);
     }
 
@@ -115,12 +111,8 @@ impl Client {
     pub fn get(session: &Session, id: &str) -> Result<Self, Error> {
         let url = format!("clients/{}", id);
         let mut resp = super::http::get(&session, url, vec![])
-            .map_err(Error::from)
-            .map_err(|err| err.context(format!("Failed to fetch client with ID {}", id)))?;
-        let body: ClientData = resp
-            .json()
-            .map_err(Error::from)
-            .map_err(|err| err.context("Failed to parse client from JSON"))?;
+            .context(format!("Failed to fetch client with ID {}", id))?;
+        let body: ClientData = resp.json().context("Failed to parse client from JSON")?;
         return Ok(body.data);
     }
 }
