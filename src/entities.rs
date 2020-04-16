@@ -72,7 +72,8 @@ impl User {
             vec![("with_related_data".to_string(), "false".to_string())],
         )
         .context("Failed to get from the \"me\" API")?;
-        resp.json().map_err(Error::from)
+        let body: UserData = resp.json().context("Failed to deserialize user data")?;
+        return Ok(body.data);
     }
 
     pub fn save(&self) {
