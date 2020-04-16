@@ -73,11 +73,7 @@ impl User {
         )
         .context("Failed to get from the \"me\" API")?;
         let body: UserData = resp.json().context("Failed to deserialize user data")?;
-        return Ok(body.data);
-    }
-
-    pub fn save(&self) {
-        unimplemented!()
+        Ok(body.data)
     }
 }
 
@@ -99,16 +95,6 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn new(name: &str, wid: usize, at: Option<String>, notes: Option<String>) -> Self {
-        Client {
-            id: 0,
-            name: name.to_string(),
-            wid,
-            at,
-            notes,
-        }
-    }
-
     // TOOD: Write a test that doesn't hit the API for me :)
     pub fn all(session: &Session) -> Result<Vec<Self>, Error> {
         let mut resp = super::http::get(&session, "clients".to_string(), Vec::new())
@@ -144,23 +130,49 @@ impl Default for Client {
     }
 }
 
-// Client tests
-#[cfg(test)]
-mod test {
-    use super::Client;
-
-    #[test]
-    pub fn client_has_name() {
-        let client = Client::new("Cool Client", 1, None, None);
-        assert!(client.name == "Cool Client");
-    }
-
-    #[test]
-    pub fn client_has_wid() {
-        let client = Client::new("Cool Client", 1, None, None);
-        assert!(client.wid == 1);
-    }
+// Projects ------------------------------------------------------------------------;
+#[derive(Serialize, Deserialize, Debug)]
+struct ProjectData {
+    data: Project,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Project {}
+pub struct Project {
+    pub id: usize,
+    pub wid: usize,
+    pub cid: usize,
+    pub name: String,
+    pub billable: bool,
+    pub is_private: bool,
+    pub active: bool,
+    pub at: Option<String>,
+    pub template: bool,
+    pub color: String,
+}
+
+impl Project {
+    pub fn get(session: &Session, id: &str) -> Result<Self, Error> {
+        let url = format!("projects/{}", id);
+        let mut resp =
+            super::http::get(&session, url, Vec::new()).context("Failed to fetch project")?;
+        let body: ProjectData = resp.json().context("Failed to parse Project from JSON")?;
+        Ok(body.data)
+    }
+}
+
+impl Default for Project {
+    fn default() -> Self {
+        Project {
+            id: 0,
+            wid: 0,
+            cid: 0,
+            name: String::default(),
+            billable: false,
+            is_private: false,
+            active: true,
+            at: None,
+            template: false,
+            color: String::default(),
+        }
+    }
+}
