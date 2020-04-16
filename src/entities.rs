@@ -108,6 +108,13 @@ impl Client {
     }
 
     // TOOD: Write a test that doesn't hit the API for me :)
+    pub fn all(session: &Session) -> Result<Vec<Self>, Error> {
+        let mut resp = super::http::get(&session, "clients".to_string(), Vec::new())
+            .context("Failed to fetch clients for this user")?;
+        resp.json().map_err(Error::from)
+    }
+
+    // TOOD: Write a test that doesn't hit the API for me :)
     pub fn get(session: &Session, id: &str) -> Result<Self, Error> {
         let url = format!("clients/{}", id);
         let mut resp = super::http::get(&session, url, vec![])
