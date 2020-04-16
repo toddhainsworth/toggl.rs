@@ -230,6 +230,14 @@ impl Workspace {
         }
         Ok(&self.projects)
     }
+
+    pub fn tasks() {
+        unimplemented!();
+    }
+
+    pub fn tags() {
+        unimplemented!();
+    }
 }
 
 impl Default for Workspace {
