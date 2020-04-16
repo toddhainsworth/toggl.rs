@@ -72,8 +72,7 @@ impl User {
             vec![("with_related_data".to_string(), "false".to_string())],
         )
         .context("Failed to get from the \"me\" API")?;
-        let body: UserData = resp.json().context("Failed to deserialize user data")?;
-        return Ok(body.data);
+        resp.json().map_err(Error::from)
     }
 
     pub fn save(&self) {
@@ -119,8 +118,7 @@ impl Client {
         let url = format!("clients/{}", id);
         let mut resp = super::http::get(&session, url, vec![])
             .context(format!("Failed to fetch client with ID {}", id))?;
-        let body: ClientData = resp.json().context("Failed to parse client from JSON")?;
-        return Ok(body.data);
+        resp.json().map_err(Error::from)
     }
 }
 
