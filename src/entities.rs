@@ -203,9 +203,34 @@ pub struct Workspace {
     pub rounding_minutes: usize,
     pub at: Option<String>,
     pub logo_url: Option<String>,
+    pub projects: Vec<Project>,
 }
 
-impl Workspace {}
+impl Workspace {
+    pub fn all(session: &Session) -> Result<Vec<Self>, Error> {
+        let mut resp = super::http::get(&session, "workspaces".to_string(), Vec::new())
+            .context("Failed to fetch all workspaces")?;
+        resp.json().map_err(Error::from)
+    }
+
+    pub fn get(session: &Session, id: &str) -> Result<Self, Error> {
+        let url = format!("workspaces/{}", id);
+        let mut resp =
+            super::http::get(&session, url, Vec::new()).context("Failed to fetch workspace")?;
+        let body: WorkspaceData = resp.json().context("Failed to parse workspace from JSON")?;
+        Ok(body.data)
+    }
+
+    pub fn projects(&mut self, session: &Session) -> Result<&Vec<Project>, Error> {
+        if self.projects.is_empty() {
+            let url = format!("workspaces/{}/projects", self.id);
+            let mut resp = super::http::get(&session, url, Vec::new())
+                .context("Failed to fetch workspace projects")?;
+            self.projects = resp.json()?;
+        }
+        Ok(&self.projects)
+    }
+}
 
 impl Default for Workspace {
     fn default() -> Self {
