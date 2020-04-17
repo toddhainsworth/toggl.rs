@@ -199,10 +199,10 @@ pub struct Workspace {
     pub at: Option<String>,
     pub logo_url: Option<String>,
     pub projects: Vec<Project>,
-    pub tasks: Vec<Project>,         // TODO
-    pub tags: Vec<Project>,          // TODO
-    pub groups: Vec<Project>,        // TODO
-    pub project_users: Vec<Project>, // TODO
+    pub tasks: Vec<Project>, // TODO
+    pub tags: Vec<Tag>,
+    pub groups: Vec<Group>,
+    pub project_users: Vec<ProjectUser>,
 }
 
 impl Workspace {
@@ -383,6 +383,34 @@ impl ProjectUser {
     }
 
     pub fn create_in_project() {
+        unimplemented!();
+    }
+}
+
+// Tags ------------------------------------------------------------------------------------------;
+#[derive(Serialize, Deserialize, Debug)]
+struct TagData {
+    pub data: Tag,
+}
+
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct Tag {
+    id: Option<String>,
+    wid: String,
+    name: String,
+}
+
+impl Tag {
+    pub fn save() {
+        // will update existing tags or create new ones (if self.id.is_none())
+        unimplemented!();
+    }
+
+    pub fn delete() {
+        unimplemented!();
+    }
+
+    pub fn delete_by_id() {
         unimplemented!();
     }
 }
