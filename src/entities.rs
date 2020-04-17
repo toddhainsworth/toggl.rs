@@ -38,6 +38,7 @@ pub struct User {
     pub send_timer_notifications: bool,
     pub openid_enabled: bool,
     pub timezone: String,
+    pub invitation: HashMap<String, String>, // TODO
 }
 
 impl Default for User {
@@ -63,6 +64,7 @@ impl Default for User {
             send_timer_notifications: false,
             openid_enabled: false,
             timezone: String::default(),
+            invitation: HashMap::new(), // TODO
         }
     }
 }
