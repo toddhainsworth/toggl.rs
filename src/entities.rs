@@ -16,7 +16,7 @@ struct UserData {
     pub data: User,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct User {
     pub id: Option<String>,
     pub api_token: String,
@@ -39,34 +39,6 @@ pub struct User {
     pub openid_enabled: bool,
     pub timezone: String,
     pub invitation: HashMap<String, String>, // TODO
-}
-
-impl Default for User {
-    fn default() -> Self {
-        User {
-            id: None,
-            api_token: String::default(),
-            default_wid: 0,
-            email: String::default(),
-            fullname: String::default(),
-            jquery_timeofday_format: String::default(),
-            jquery_date_format: String::default(),
-            timeofday_format: String::default(),
-            date_format: String::default(),
-            store_start_and_stop_time: false,
-            beginning_of_week: 0,
-            language: String::default(),
-            image_url: String::default(),
-            sidebar_piechart: false,
-            at: None,
-            new_blog_post: HashMap::new(), // TODO
-            send_product_emails: false,
-            send_timer_notifications: false,
-            openid_enabled: false,
-            timezone: String::default(),
-            invitation: HashMap::new(), // TODO
-        }
-    }
 }
 
 impl User {
@@ -100,7 +72,7 @@ struct ClientData {
     pub data: Client,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Client {
     pub id: Option<String>,
     pub name: String,
@@ -154,26 +126,13 @@ impl Client {
     }
 }
 
-impl Default for Client {
-    fn default() -> Self {
-        Client {
-            id: None,
-            name: String::default(),
-            wid: None,
-            at: None,
-            notes: None,
-            projects: Vec::new(),
-        }
-    }
-}
-
 // Projects ------------------------------------------------------------------------;
 #[derive(Serialize, Deserialize, Debug)]
 struct ProjectData {
     data: Project,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Project {
     pub id: Option<usize>,
     pub wid: Option<usize>,
@@ -218,23 +177,6 @@ impl Project {
     }
 }
 
-impl Default for Project {
-    fn default() -> Self {
-        Project {
-            id: None,
-            wid: None,
-            cid: None,
-            name: String::default(),
-            billable: false,
-            is_private: false,
-            active: true,
-            at: None,
-            template: false,
-            color: String::default(),
-        }
-    }
-}
-
 // Workspaces ------------------------------------------------------------------------;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -242,7 +184,7 @@ struct WorkspaceData {
     data: Workspace,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Workspace {
     pub id: Option<String>,
     pub name: String,
@@ -303,34 +245,20 @@ impl Workspace {
     pub fn groups() {
         unimplemented!();
     }
-}
 
-impl Default for Workspace {
-    fn default() -> Self {
-        Workspace {
-            id: None,
-            name: String::default(),
-            premium: false,
-            admin: false,
-            default_hourly_rate: 0,
-            default_currency: "AUD".to_string(),
-            only_admins_may_create_projects: true,
-            only_admins_see_billable_rates: true,
-            rounding: 1,
-            rounding_minutes: 15,
-            at: None,
-            logo_url: None,
-            projects: Vec::new(),
-        }
+    pub fn project_users() {
+        unimplemented!();
     }
 }
 
 // Time Entries ------------------------------------------------------------------------;
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct TimeEntryData {
     pub data: TimeEntry,
 }
 
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct TimeEntry {
     pub description: String,
     pub wid: Option<String>,
@@ -344,25 +272,6 @@ pub struct TimeEntry {
     pub tags: Vec<String>,
     pub duronly: bool,
     pub at: Option<String>,
-}
-
-impl Default for TimeEntry {
-    fn default() -> Self {
-        TimeEntry {
-            description: String::default(),
-            wid: None,
-            pid: None,
-            tid: None,
-            billable: true,
-            start: String::default(),
-            stop: None,
-            duration: 0,
-            created_with: "toggl.rs".to_string(),
-            tags: Vec::default(),
-            duronly: false,
-            at: None,
-        }
-    }
 }
 
 impl TimeEntry {
@@ -404,26 +313,17 @@ impl TimeEntry {
 
 // Groups ---------------------------------------------------------------------------------------;
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GroupData {
     pub data: Group,
 }
 
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Group {
     pub id: Option<String>,
     pub name: String,
     pub wid: String,
     pub at: Option<String>, // TODO: chronos::DateTime
-}
-
-impl Default for Group {
-    fn default() -> Self {
-        Group {
-            id: None,
-            name: String::default(),
-            wid: String::default(),
-            at: None,
-        }
-    }
 }
 
 impl Group {
