@@ -175,7 +175,7 @@ struct ProjectData {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Project {
-    pub id: usize,
+    pub id: Option<usize>,
     pub wid: Option<usize>,
     pub cid: Option<usize>,
     pub name: String,
@@ -221,7 +221,7 @@ impl Project {
 impl Default for Project {
     fn default() -> Self {
         Project {
-            id: 0,
+            id: None,
             wid: None,
             cid: None,
             name: String::default(),
@@ -244,7 +244,7 @@ struct WorkspaceData {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Workspace {
-    pub id: usize,
+    pub id: Option<String>,
     pub name: String,
     pub premium: bool,
     pub admin: bool,
@@ -276,7 +276,11 @@ impl Workspace {
 
     pub fn projects(&mut self, session: &Session) -> Result<&Vec<Project>, Error> {
         if self.projects.is_empty() {
-            let url = format!("workspaces/{}/projects", self.id);
+            let id = self.id.as_ref().ok_or(TogglError::from(
+                "Cannot get projects for client with no ID",
+            ))?;
+
+            let url = format!("workspaces/{}/projects", id);
             let mut resp = super::http::get(&session, url, Vec::new())
                 .context("Failed to fetch workspace projects")?;
             self.projects = resp.json()?;
@@ -295,12 +299,16 @@ impl Workspace {
     pub fn clients() {
         unimplemented!();
     }
+
+    pub fn groups() {
+        unimplemented!();
+    }
 }
 
 impl Default for Workspace {
     fn default() -> Self {
         Workspace {
-            id: 0,
+            id: None,
             name: String::default(),
             premium: false,
             admin: false,
@@ -325,9 +333,9 @@ pub struct TimeEntryData {
 
 pub struct TimeEntry {
     pub description: String,
-    pub wid: Option<usize>,
-    pub pid: Option<usize>,
-    pub tid: Option<usize>,
+    pub wid: Option<String>,
+    pub pid: Option<String>,
+    pub tid: Option<String>,
     pub billable: bool,
     pub start: String,
     pub stop: Option<String>,
