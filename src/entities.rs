@@ -345,3 +345,44 @@ impl Group {
         unimplemented!();
     }
 }
+
+// ProjectUsers ---------------------------------------------------------------------------------;
+#[derive(Serialize, Deserialize, Debug)]
+struct ProjectUsersData {
+    data: ProjectUser,
+}
+
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct ProjectUser {
+    pub id: Option<String>,
+    pub pid: String,
+    pub uid: String,
+    pub wid: Option<String>,
+    pub manager: bool,
+    pub rate: f64,
+    pub at: Option<String>,
+}
+
+impl ProjectUser {
+    pub fn save() {
+        // will update existing or create new project user (if self.id.is_none())
+        unimplemented!();
+    }
+
+    pub fn mass_save() {
+        // will update existing only
+        unimplemented!();
+    }
+
+    pub fn delete() {
+        unimplemented!();
+    }
+
+    pub fn delete_by_id() {
+        unimplemented!();
+    }
+
+    pub fn create_in_project() {
+        unimplemented!();
+    }
+}
