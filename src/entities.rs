@@ -263,12 +263,12 @@ impl Default for Workspace {
 // Time Entries ------------------------------------------------------------------------;
 
 pub struct TimeEntryData {
-    data: TimeEntry,
+    pub data: TimeEntry,
 }
 
 pub struct TimeEntry {
     pub description: String,
-    pub wid: usize,
+    pub wid: Option<usize>,
     pub pid: Option<usize>,
     pub tid: Option<usize>,
     pub billable: bool,
@@ -279,4 +279,23 @@ pub struct TimeEntry {
     pub tags: Vec<String>,
     pub duronly: bool,
     pub at: Option<String>,
+}
+
+impl Default for TimeEntry {
+    fn default() -> Self {
+        TimeEntry {
+            description: String::default(),
+            wid: None,
+            pid: None,
+            tid: None,
+            billable: true,
+            start: String::default(),
+            stop: None,
+            duration: 0,
+            created_with: "toggl.rs".to_string(),
+            tags: Vec::default(),
+            duronly: false,
+            at: None,
+        }
+    }
 }
