@@ -198,11 +198,12 @@ pub struct Workspace {
     pub rounding_minutes: usize,
     pub at: Option<String>,
     pub logo_url: Option<String>,
-    pub projects: Vec<Project>,
-    pub tasks: Vec<Task>,
-    pub tags: Vec<Tag>,
-    pub groups: Vec<Group>,
-    pub project_users: Vec<ProjectUser>,
+    pub projects: Option<Vec<Project>>,
+    pub tasks: Option<Vec<Task>>,
+    pub tags: Option<Vec<Tag>>,
+    pub groups: Option<Vec<Group>>,
+    pub project_users: Option<Vec<ProjectUser>>,
+    pub workspace_users: Option<Vec<WorkspaceUser>>,
 }
 
 impl Workspace {
@@ -221,7 +222,7 @@ impl Workspace {
     }
 
     pub fn projects(&mut self, session: &Session) -> Result<&Vec<Project>, Error> {
-        if self.projects.is_empty() {
+        if self.projects.is_none() {
             let id = self.id.as_ref().ok_or(TogglError::from(
                 "Cannot get projects for client with no ID",
             ))?;
@@ -229,9 +230,13 @@ impl Workspace {
             let url = format!("workspaces/{}/projects", id);
             let mut resp = super::http::get(&session, url, Vec::new())
                 .context("Failed to fetch workspace projects")?;
-            self.projects = resp.json()?;
+            let projects: Vec<Project> = resp.json()?;
+            self.projects = Some(projects);
         }
-        Ok(&self.projects)
+        Ok(&self
+            .projects
+            .as_ref()
+            .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
     pub fn tasks() {
