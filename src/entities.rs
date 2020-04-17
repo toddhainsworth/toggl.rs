@@ -121,7 +121,7 @@ impl Client {
         unimplemented!();
     }
 
-    pub fn delete_by_id() {
+    pub fn delete_by_ids() {
         unimplemented!();
     }
 }
@@ -341,7 +341,7 @@ impl Group {
         unimplemented!();
     }
 
-    pub fn delete_by_id() {
+    pub fn delete_by_ids() {
         unimplemented!();
     }
 }
@@ -378,7 +378,7 @@ impl ProjectUser {
         unimplemented!();
     }
 
-    pub fn delete_by_id() {
+    pub fn delete_by_ids() {
         unimplemented!();
     }
 
