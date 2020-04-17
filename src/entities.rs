@@ -401,3 +401,43 @@ impl TimeEntry {
         unimplemented!();
     }
 }
+
+// Groups ---------------------------------------------------------------------------------------;
+
+pub struct GroupData {
+    pub data: Group,
+}
+
+pub struct Group {
+    pub id: Option<String>,
+    pub name: String,
+    pub wid: String,
+    pub at: Option<String>, // TODO: chronos::DateTime
+}
+
+impl Default for Group {
+    fn default() -> Self {
+        Group {
+            id: None,
+            name: String::default(),
+            wid: String::default(),
+            at: None,
+        }
+    }
+}
+
+impl Group {
+    // Doesn't seem to offer a get API
+    pub fn save() {
+        // will update existing or create new (if self.id.is_none())
+        unimplemented!();
+    }
+
+    pub fn delete() {
+        unimplemented!();
+    }
+
+    pub fn delete_by_id() {
+        unimplemented!();
+    }
+}
