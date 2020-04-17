@@ -154,9 +154,9 @@ struct ProjectData {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Project {
-    pub id: Option<usize>,
-    pub wid: Option<usize>,
-    pub cid: Option<usize>,
+    pub id: Option<String>,
+    pub wid: Option<String>,
+    pub cid: Option<String>,
     pub name: String,
     pub billable: bool,
     pub is_private: bool,
