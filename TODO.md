@@ -1,0 +1,5 @@
+- Mocked API
+  - Then we can send "requests" and check that we're sending the correct format
+  - Basically take the example requests and responses from the API docs and match them
+- Allow users to use &str's...lifetimes and all those goodies
+- Unit-testing
