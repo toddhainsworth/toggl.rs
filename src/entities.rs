@@ -1,11 +1,9 @@
+use super::error::TogglError;
+use super::http;
 use super::session::Session;
-
+use failure::{Error, ResultExt};
 use std::collections::HashMap;
 use std::fmt::Debug;
-
-use failure::{Error, ResultExt};
-
-use super::error::TogglError;
 
 // Users ------------------------------------------------------------------------------------;
 
@@ -43,7 +41,7 @@ pub struct User {
 
 impl User {
     pub fn me(session: &Session) -> Result<Self, Error> {
-        let mut resp = super::http::get(
+        let mut resp = http::get(
             session,
             "me".to_string(),
             vec![("with_related_data".to_string(), "false".to_string())],
@@ -84,7 +82,7 @@ pub struct Client {
 impl Client {
     // TOOD: Write a test that doesn't hit the API for me :)
     pub fn all(session: &Session) -> Result<Vec<Self>, Error> {
-        let mut resp = super::http::get(&session, "clients".to_string(), Vec::new())
+        let mut resp = http::get(&session, "clients".to_string(), Vec::new())
             .context("Failed to fetch clients for this user")?;
         resp.json().map_err(Error::from)
     }
@@ -92,7 +90,7 @@ impl Client {
     // TOOD: Write a test that doesn't hit the API for me :)
     pub fn get(session: &Session, id: &str) -> Result<Self, Error> {
         let url = format!("clients/{}", id);
-        let mut resp = super::http::get(&session, url, vec![])
+        let mut resp = http::get(&session, url, vec![])
             .context(format!("Failed to fetch client with ID {}", id))?;
         resp.json().map_err(Error::from)
     }
@@ -104,8 +102,8 @@ impl Client {
 
         if self.projects.is_empty() {
             let url = format!("clients/{}/projects", id);
-            let mut resp = super::http::get(&session, url, Vec::new())
-                .context("Failed to fetch client projects")?;
+            let mut resp =
+                http::get(&session, url, Vec::new()).context("Failed to fetch client projects")?;
             self.projects = resp.json()?;
         }
         Ok(&self.projects)
@@ -148,8 +146,7 @@ pub struct Project {
 impl Project {
     pub fn get(session: &Session, id: &str) -> Result<Self, Error> {
         let url = format!("projects/{}", id);
-        let mut resp =
-            super::http::get(&session, url, Vec::new()).context("Failed to fetch project")?;
+        let mut resp = http::get(&session, url, Vec::new()).context("Failed to fetch project")?;
         let body: ProjectData = resp.json().context("Failed to parse Project from JSON")?;
         Ok(body.data)
     }
@@ -207,15 +204,14 @@ pub struct Workspace {
 
 impl Workspace {
     pub fn all(session: &Session) -> Result<Vec<Self>, Error> {
-        let mut resp = super::http::get(&session, "workspaces".to_string(), Vec::new())
+        let mut resp = http::get(&session, "workspaces".to_string(), Vec::new())
             .context("Failed to fetch all workspaces")?;
         resp.json().map_err(Error::from)
     }
 
     pub fn get(session: &Session, id: &str) -> Result<Self, Error> {
         let url = format!("workspaces/{}", id);
-        let mut resp =
-            super::http::get(&session, url, Vec::new()).context("Failed to fetch workspace")?;
+        let mut resp = http::get(&session, url, Vec::new()).context("Failed to fetch workspace")?;
         let body: WorkspaceData = resp.json().context("Failed to parse workspace from JSON")?;
         Ok(body.data)
     }
@@ -227,7 +223,7 @@ impl Workspace {
             ))?;
 
             let url = format!("workspaces/{}/projects", id);
-            let mut resp = super::http::get(&session, url, Vec::new())
+            let mut resp = http::get(&session, url, Vec::new())
                 .context("Failed to fetch workspace projects")?;
             let projects: Vec<Project> = resp.json()?;
             self.projects = Some(projects);
