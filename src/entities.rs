@@ -114,12 +114,35 @@ impl Client {
         unimplemented!();
     }
 
-    pub fn delete() {
-        unimplemented!();
+    pub fn delete(self, session: &Session) -> Result<bool, Error> {
+        let id = self
+            .id
+            .as_ref()
+            .ok_or(TogglError::from("Cannot delete client with no ID"))?;
+        let url = format!("clients/{}", id);
+        http::delete(session, url)
+            .map(|r| r.status().is_success())
+            .map_err(Error::from)
     }
 
-    pub fn delete_by_ids() {
-        unimplemented!();
+    pub fn delete_by_ids(
+        self,
+        session: &Session,
+        ids: Vec<String>,
+    ) -> HashMap<String, Result<bool, Error>> {
+        // TODO: not totally sure what we should return here...was thinking just a
+        // Result<bool, Error> but that seems like it's too vague
+        ids.into_iter()
+            .map(|id| (id.clone(), Client::from_id(id).delete(session)))
+            .collect()
+    }
+
+    // Util function to create a default client from the given id.
+    // Note; no request to Toggl
+    pub fn from_id(id: String) -> Self {
+        let mut client = Client::default();
+        client.id = Some(id);
+        client
     }
 }
 
