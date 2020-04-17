@@ -199,6 +199,10 @@ pub struct Workspace {
     pub at: Option<String>,
     pub logo_url: Option<String>,
     pub projects: Vec<Project>,
+    pub tasks: Vec<Project>,         // TODO
+    pub tags: Vec<Project>,          // TODO
+    pub groups: Vec<Project>,        // TODO
+    pub project_users: Vec<Project>, // TODO
 }
 
 impl Workspace {
