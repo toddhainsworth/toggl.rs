@@ -467,3 +467,27 @@ impl Task {
         unimplemented!();
     }
 }
+
+// Workspace Users --------------------------------------------------------------------------------;
+#[derive(Serialize, Deserialize, Debug)]
+struct WorkspaceUserData {
+    pub data: WorkspaceUser,
+}
+
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct WorkspaceUser {}
+
+impl WorkspaceUser {
+    pub fn save() {
+        // will update existing workspace user or create new (if self.id.is_none())
+        unimplemented!();
+    }
+
+    pub fn delete() {
+        unimplemented!();
+    }
+
+    pub fn delete_by_id() {
+        unimplemented!();
+    }
+}
