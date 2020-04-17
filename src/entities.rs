@@ -43,7 +43,6 @@ pub struct User {
 
 impl User {
     pub fn me(session: &Session) -> Result<Self, Error> {
-        // TODO: better messaging?
         let mut resp = super::http::get(
             session,
             "me".to_string(),

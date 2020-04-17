@@ -1,10 +1,10 @@
 extern crate reqwest;
 
-use std::collections::HashMap;
-
-use reqwest::{Client, Response, Result};
+// TODO: there's soooooooo much dupilication in here
 
 use super::session::Session;
+use reqwest::{Client, Response, Result};
+use std::collections::HashMap;
 
 const TOGGL_API_BASE: &str = "https://www.toggl.com/api/v8";
 
@@ -27,6 +27,16 @@ pub fn post(session: &Session, url: String, params: HashMap<String, String>) -> 
         .post(&full_url)
         .basic_auth(&session.api_key, Some("api_token"))
         .json(&params)
+        .send()
+}
+
+#[allow(dead_code)]
+pub fn delete(session: &Session, url: String) -> Result<Response> {
+    let full_url = get_url(url);
+    let client = Client::new();
+    client
+        .delete(&full_url)
+        .basic_auth(&session.api_key, Some("api_token"))
         .send()
 }
 
