@@ -258,6 +258,14 @@ impl Workspace {
     pub fn project_users() {
         unimplemented!();
     }
+
+    pub fn workspace_users() {
+        unimplemented!();
+    }
+
+    pub fn invite_user() {
+        unimplemented!();
+    }
 }
 
 // Time Entries ------------------------------------------------------------------------;
@@ -351,7 +359,7 @@ impl Group {
     }
 }
 
-// ProjectUsers ---------------------------------------------------------------------------------;
+// Project Users ---------------------------------------------------------------------------------;
 #[derive(Serialize, Deserialize, Debug)]
 struct ProjectUsersData {
     data: ProjectUser,
