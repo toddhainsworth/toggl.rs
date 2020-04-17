@@ -79,6 +79,15 @@ impl User {
         let body: UserData = resp.json().context("Failed to deserialize user data")?;
         Ok(body.data)
     }
+
+    pub fn save() {
+        // Also covers signing up new user (if self.id.is_none())
+        unimplemented!();
+    }
+
+    pub fn reset_token() {
+        unimplemented!();
+    }
 }
 
 // Clients ------------------------------------------------------------------------------------;
@@ -128,6 +137,19 @@ impl Client {
         }
         Ok(&self.projects)
     }
+
+    pub fn save() {
+        // Also covers creating a new client (if self.id.is_none())
+        unimplemented!();
+    }
+
+    pub fn delete() {
+        unimplemented!();
+    }
+
+    pub fn delete_by_id() {
+        unimplemented!();
+    }
 }
 
 impl Default for Client {
@@ -170,6 +192,27 @@ impl Project {
             super::http::get(&session, url, Vec::new()).context("Failed to fetch project")?;
         let body: ProjectData = resp.json().context("Failed to parse Project from JSON")?;
         Ok(body.data)
+    }
+
+    pub fn save() {
+        // Also covers creating new project (if self.id.is_none())
+        unimplemented!();
+    }
+
+    pub fn delete() {
+        unimplemented!();
+    }
+
+    pub fn delete_by_ids() {
+        unimplemented!();
+    }
+
+    pub fn users() {
+        unimplemented!();
+    }
+
+    pub fn tasks() {
+        unimplemented!();
     }
 }
 
@@ -246,6 +289,10 @@ impl Workspace {
     pub fn tags() {
         unimplemented!();
     }
+
+    pub fn clients() {
+        unimplemented!();
+    }
 }
 
 impl Default for Workspace {
@@ -305,5 +352,42 @@ impl Default for TimeEntry {
             duronly: false,
             at: None,
         }
+    }
+}
+
+impl TimeEntry {
+    pub fn get() {
+        unimplemented!();
+    }
+
+    // get between two dates
+    pub fn get_in_range() {
+        unimplemented!();
+    }
+
+    pub fn get_running() {
+        unimplemented!();
+    }
+
+    pub fn save() {
+        // updates existing or creates a new one (if self.id.is_none())
+        unimplemented!();
+    }
+
+    // does not take `self` instead takes a Vec<TimeEntry> and pushes to the bulk API
+    pub fn bulk_save() {
+        unimplemented!();
+    }
+
+    pub fn start() {
+        unimplemented!();
+    }
+
+    pub fn stop() {
+        unimplemented!();
+    }
+
+    pub fn delete() {
+        unimplemented!();
     }
 }
