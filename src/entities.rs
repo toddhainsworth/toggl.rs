@@ -5,6 +5,8 @@ use std::fmt::Debug;
 
 use failure::{Error, ResultExt};
 
+use super::error::TogglError;
+
 // Users ------------------------------------------------------------------------------------;
 
 // FIXME: I'm not overly fond of this...
@@ -16,6 +18,7 @@ struct UserData {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct User {
+    pub id: Option<String>,
     pub api_token: String,
     pub default_wid: usize,
     pub email: String,
@@ -40,6 +43,7 @@ pub struct User {
 impl Default for User {
     fn default() -> Self {
         User {
+            id: None,
             api_token: String::default(),
             default_wid: 0,
             email: String::default(),
@@ -87,7 +91,7 @@ struct ClientData {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Client {
-    pub id: usize,
+    pub id: Option<String>,
     pub name: String,
     pub wid: Option<usize>,
     pub notes: Option<String>,
@@ -112,8 +116,12 @@ impl Client {
     }
 
     pub fn projects(&mut self, session: &Session) -> Result<&Vec<Project>, Error> {
+        let id = self.id.as_ref().ok_or(TogglError::from(
+            "Cannot get projects for client with no ID",
+        ))?;
+
         if self.projects.is_empty() {
-            let url = format!("clients/{}/projects", self.id);
+            let url = format!("clients/{}/projects", id);
             let mut resp = super::http::get(&session, url, Vec::new())
                 .context("Failed to fetch client projects")?;
             self.projects = resp.json()?;
@@ -125,7 +133,7 @@ impl Client {
 impl Default for Client {
     fn default() -> Self {
         Client {
-            id: 0,
+            id: None,
             name: String::default(),
             wid: None,
             at: None,

@@ -1,4 +1,5 @@
 pub mod entities;
+pub mod error;
 mod http;
 pub mod session;
 
