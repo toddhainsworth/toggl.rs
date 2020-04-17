@@ -199,7 +199,7 @@ pub struct Workspace {
     pub at: Option<String>,
     pub logo_url: Option<String>,
     pub projects: Vec<Project>,
-    pub tasks: Vec<Project>, // TODO
+    pub tasks: Vec<Task>,
     pub tags: Vec<Tag>,
     pub groups: Vec<Group>,
     pub project_users: Vec<ProjectUser>,
@@ -410,7 +410,47 @@ impl Tag {
         unimplemented!();
     }
 
-    pub fn delete_by_id() {
+    pub fn delete_by_ids() {
+        unimplemented!();
+    }
+}
+
+// Tasks ------------------------------------------------------------------------------------------;
+#[derive(Serialize, Deserialize, Debug)]
+struct TaskData {
+    pub data: Task,
+}
+
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct Task {
+    pub id: Option<String>,
+    pub name: String,
+    pub wid: Option<String>,
+    pub pid: String,
+    pub active: bool,
+    pub estimated_seconds: usize,
+}
+
+impl Task {
+    pub fn get() {
+        unimplemented!();
+    }
+
+    pub fn save() {
+        // updates existing task or creates a new one (if self.id.is_none())
+        unimplemented!();
+    }
+
+    pub fn mass_save() {
+        // will update existing only
+        unimplemented!();
+    }
+
+    pub fn delete() {
+        unimplemented!();
+    }
+
+    pub fn delete_by_ids() {
         unimplemented!();
     }
 }
