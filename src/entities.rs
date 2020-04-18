@@ -164,6 +164,8 @@ pub struct Project {
     pub at: Option<String>,
     pub template: bool,
     pub color: String,
+    pub users: Option<Vec<User>>,
+    pub tasks: Option<Vec<Task>>,
 }
 
 impl Project {
@@ -210,12 +212,42 @@ impl Project {
         project
     }
 
-    pub fn users() {
-        unimplemented!();
+    pub fn users(&mut self, session: &Session) -> Result<&Vec<User>, Error> {
+        if self.users.is_none() {
+            let id = self
+                .id
+                .as_ref()
+                .ok_or(TogglError::from("Cannot get users for project with no ID"))?;
+
+            let url = format!("projects/{}/users", id);
+            let mut resp =
+                http::get(&session, url, Vec::new()).context("Failed to fetch project users")?;
+            let users: Vec<User> = resp.json()?;
+            self.users = Some(users);
+        }
+        Ok(&self
+            .users
+            .as_ref()
+            .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    pub fn tasks() {
-        unimplemented!();
+    pub fn tasks(&mut self, session: &Session) -> Result<&Vec<Task>, Error> {
+        if self.tasks.is_none() {
+            let id = self
+                .id
+                .as_ref()
+                .ok_or(TogglError::from("Cannot get tasks for project with no ID"))?;
+
+            let url = format!("projects/{}/tasks", id);
+            let mut resp =
+                http::get(&session, url, Vec::new()).context("Failed to fetch project tasks")?;
+            let tasks: Vec<Task> = resp.json()?;
+            self.tasks = Some(tasks);
+        }
+        Ok(&self
+            .tasks
+            .as_ref()
+            .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 }
 

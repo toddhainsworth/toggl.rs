@@ -3,3 +3,5 @@
   - Basically take the example requests and responses from the API docs and match them
 - Allow users to use &str's...lifetimes and all those goodies
 - Unit-testing
+- Some sort of universal fetcher to get rid of the association duplication
+  - (eg. Workspace::projects implementation is duplicated _everywhere_)
