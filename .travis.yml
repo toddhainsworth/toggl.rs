@@ -9,7 +9,7 @@ jobs:
   fast_finish: true
 cache: cargo
 before_script:
-  - cargo install --git https://github.com/rust-lang/rust-clippy/ --force clippy
+  - rustup component add clippy
 script:
   - cargo clippy
   - cargo test
