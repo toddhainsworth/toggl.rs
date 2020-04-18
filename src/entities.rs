@@ -76,7 +76,7 @@ pub struct Client {
     pub wid: Option<usize>,
     pub notes: Option<String>,
     pub at: Option<String>,
-    pub projects: Vec<Project>,
+    pub projects: Option<Vec<Project>>,
 }
 
 impl Client {
@@ -96,17 +96,20 @@ impl Client {
     }
 
     pub fn projects(&mut self, session: &Session) -> Result<&Vec<Project>, Error> {
-        let id = self.id.as_ref().ok_or(TogglError::from(
-            "Cannot get projects for client with no ID",
-        ))?;
+        if self.projects.is_none() {
+            let id = self.id.as_ref().ok_or(TogglError::from(
+                "Cannot get projects for client with no ID",
+            ))?;
 
-        if self.projects.is_empty() {
             let url = format!("clients/{}/projects", id);
             let mut resp =
                 http::get(&session, url, Vec::new()).context("Failed to fetch client projects")?;
             self.projects = resp.json()?;
         }
-        Ok(&self.projects)
+        Ok(&self
+            .projects
+            .as_ref()
+            .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
     pub fn save() {
@@ -204,14 +207,6 @@ impl Project {
             .collect()
     }
 
-    // Util function to create a default client from the given id.
-    // Note; no request to Toggl
-    pub fn from_id(id: String) -> Self {
-        let mut project = Project::default();
-        project.id = Some(id);
-        project
-    }
-
     pub fn users(&mut self, session: &Session) -> Result<&Vec<User>, Error> {
         if self.users.is_none() {
             let id = self
@@ -248,6 +243,14 @@ impl Project {
             .tasks
             .as_ref()
             .expect("Okay to unwrap because we ensure it's atleast an empty array"))
+    }
+
+    // Util function to create a default client from the given id.
+    // Note; no request to Toggl
+    pub fn from_id(id: String) -> Self {
+        let mut project = Project::default();
+        project.id = Some(id);
+        project
     }
 }
 
