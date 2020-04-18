@@ -97,9 +97,10 @@ impl Client {
 
     pub fn projects(&mut self, session: &Session) -> Result<&Vec<Project>, Error> {
         if self.projects.is_none() {
-            let id = self.id.as_ref().ok_or(TogglError::from(
-                "Cannot get projects for client with no ID",
-            ))?;
+            let id = self
+                .id
+                .as_ref()
+                .ok_or_else(|| TogglError::from("Cannot get projects for client with no ID"))?;
 
             let url = format!("clients/{}/projects", id);
             let mut resp =
@@ -121,7 +122,7 @@ impl Client {
         let id = self
             .id
             .as_ref()
-            .ok_or(TogglError::from("Cannot delete client with no ID"))?;
+            .ok_or_else(|| TogglError::from("Cannot delete client with no ID"))?;
         let url = format!("clients/{}", id);
         http::delete(session, url)
             .map(|r| r.status().is_success())
@@ -188,7 +189,7 @@ impl Project {
         let id = self
             .id
             .as_ref()
-            .ok_or(TogglError::from("Cannot delete project with no ID"))?;
+            .ok_or_else(|| TogglError::from("Cannot delete project with no ID"))?;
         let url = format!("projects/{}", id);
         http::delete(session, url)
             .map(|r| r.status().is_success())
@@ -212,7 +213,7 @@ impl Project {
             let id = self
                 .id
                 .as_ref()
-                .ok_or(TogglError::from("Cannot get users for project with no ID"))?;
+                .ok_or_else(|| TogglError::from("Cannot get users for project with no ID"))?;
 
             let url = format!("projects/{}/users", id);
             let mut resp =
@@ -231,7 +232,7 @@ impl Project {
             let id = self
                 .id
                 .as_ref()
-                .ok_or(TogglError::from("Cannot get tasks for project with no ID"))?;
+                .ok_or_else(|| TogglError::from("Cannot get tasks for project with no ID"))?;
 
             let url = format!("projects/{}/tasks", id);
             let mut resp =
@@ -299,9 +300,10 @@ impl Workspace {
 
     pub fn projects(&mut self, session: &Session) -> Result<&Vec<Project>, Error> {
         if self.projects.is_none() {
-            let id = self.id.as_ref().ok_or(TogglError::from(
-                "Cannot get projects for client with no ID",
-            ))?;
+            let id = self
+                .id
+                .as_ref()
+                .ok_or_else(|| TogglError::from("Cannot get projects for client with no ID"))?;
 
             let url = format!("workspaces/{}/projects", id);
             let mut resp = http::get(&session, url, Vec::new())
