@@ -274,6 +274,7 @@ pub struct Workspace {
     pub projects: Option<Vec<Project>>,
     pub tasks: Option<Vec<Task>>,
     pub tags: Option<Vec<Tag>>,
+    pub clients: Option<Vec<Client>>,
     pub groups: Option<Vec<Group>>,
     pub project_users: Option<Vec<ProjectUser>>,
     pub workspace_users: Option<Vec<WorkspaceUser>>,
@@ -312,28 +313,116 @@ impl Workspace {
             .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    pub fn tasks() {
-        unimplemented!();
+    pub fn tasks(&mut self, session: &Session) -> Result<&Vec<Task>, Error> {
+        if self.tasks.is_none() {
+            let id = self
+                .id
+                .as_ref()
+                .ok_or_else(|| TogglError::from("Cannot get tasks for client with no ID"))?;
+
+            let url = format!("workspaces/{}/tasks", id);
+            let mut resp =
+                http::get(&session, url, Vec::new()).context("Failed to fetch workspace tasks")?;
+            let tasks: Vec<Task> = resp.json()?;
+            self.tasks = Some(tasks);
+        }
+        Ok(&self
+            .tasks
+            .as_ref()
+            .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    pub fn tags() {
-        unimplemented!();
+    pub fn tags(&mut self, session: &Session) -> Result<&Vec<Tag>, Error> {
+        if self.tags.is_none() {
+            let id = self
+                .id
+                .as_ref()
+                .ok_or_else(|| TogglError::from("Cannot get tags for client with no ID"))?;
+
+            let url = format!("workspaces/{}/tags", id);
+            let mut resp =
+                http::get(&session, url, Vec::new()).context("Failed to fetch workspace tags")?;
+            let tags: Vec<Tag> = resp.json()?;
+            self.tags = Some(tags);
+        }
+        Ok(&self
+            .tags
+            .as_ref()
+            .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    pub fn clients() {
-        unimplemented!();
+    pub fn clients(&mut self, session: &Session) -> Result<&Vec<Client>, Error> {
+        if self.clients.is_none() {
+            let id = self
+                .id
+                .as_ref()
+                .ok_or_else(|| TogglError::from("Cannot get clients for client with no ID"))?;
+
+            let url = format!("workspaces/{}/clients", id);
+            let mut resp = http::get(&session, url, Vec::new())
+                .context("Failed to fetch workspace clients")?;
+            let clients: Vec<Client> = resp.json()?;
+            self.clients = Some(clients);
+        }
+        Ok(&self
+            .clients
+            .as_ref()
+            .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    pub fn groups() {
-        unimplemented!();
+    pub fn groups(&mut self, session: &Session) -> Result<&Vec<Group>, Error> {
+        if self.groups.is_none() {
+            let id = self
+                .id
+                .as_ref()
+                .ok_or_else(|| TogglError::from("Cannot get groups for client with no ID"))?;
+
+            let url = format!("workspaces/{}/groups", id);
+            let mut resp =
+                http::get(&session, url, Vec::new()).context("Failed to fetch workspace groups")?;
+            let groups: Vec<Group> = resp.json()?;
+            self.groups = Some(groups);
+        }
+        Ok(&self
+            .groups
+            .as_ref()
+            .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    pub fn project_users() {
-        unimplemented!();
+    pub fn project_users(&mut self, session: &Session) -> Result<&Vec<ProjectUser>, Error> {
+        if self.project_users.is_none() {
+            let id = self.id.as_ref().ok_or_else(|| {
+                TogglError::from("Cannot get project users for client with no ID")
+            })?;
+
+            let url = format!("workspaces/{}/project_users", id);
+            let mut resp = http::get(&session, url, Vec::new())
+                .context("Failed to fetch workspace project_users")?;
+            let project_users: Vec<ProjectUser> = resp.json()?;
+            self.project_users = Some(project_users);
+        }
+        Ok(&self
+            .project_users
+            .as_ref()
+            .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    pub fn workspace_users() {
-        unimplemented!();
+    pub fn workspace_users(&mut self, session: &Session) -> Result<&Vec<WorkspaceUser>, Error> {
+        if self.workspace_users.is_none() {
+            let id = self.id.as_ref().ok_or_else(|| {
+                TogglError::from("Cannot get workspace users for client with no ID")
+            })?;
+
+            let url = format!("workspaces/{}/workspace_users", id);
+            let mut resp = http::get(&session, url, Vec::new())
+                .context("Failed to fetch workspace workspace_users")?;
+            let workspace_users: Vec<WorkspaceUser> = resp.json()?;
+            self.workspace_users = Some(workspace_users);
+        }
+        Ok(&self
+            .workspace_users
+            .as_ref()
+            .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
     pub fn invite_user() {
