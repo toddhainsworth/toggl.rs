@@ -196,16 +196,11 @@ impl Project {
             .map_err(Error::from)
     }
 
-    pub fn delete_by_ids(
-        self,
-        session: &Session,
-        ids: Vec<String>,
-    ) -> HashMap<String, Result<bool, Error>> {
+    pub fn delete_by_ids(self, session: &Session, ids: Vec<String>) -> Result<(), Error> {
         // TODO: not totally sure what we should return here...was thinking just a
         // Result<bool, Error> but that seems like it's too vague
-        ids.into_iter()
-            .map(|id| (id.clone(), Project::from_id(id).delete(session)))
-            .collect()
+        let url = format!("projects/{}", ids.join(","));
+        http::delete(session, url).map(|_| ()).map_err(Error::from)
     }
 
     pub fn users(&mut self, session: &Session) -> Result<&Vec<User>, Error> {
