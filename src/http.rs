@@ -4,6 +4,7 @@ extern crate reqwest;
 
 use super::session::Session;
 use reqwest::{Client, Response, Result};
+use serde::Serialize;
 use std::collections::HashMap;
 
 const TOGGL_API_BASE: &str = "https://www.toggl.com/api/v8";
@@ -20,7 +21,11 @@ pub fn get(session: &Session, url: String, params: Vec<(String, String)>) -> Res
 }
 
 #[allow(dead_code)]
-pub fn post(session: &Session, url: String, params: HashMap<String, String>) -> Result<Response> {
+pub fn post<T: Serialize>(
+    session: &Session,
+    url: String,
+    params: HashMap<String, T>,
+) -> Result<Response> {
     let full_url = get_url(url);
     let client = Client::new();
     client

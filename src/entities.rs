@@ -425,8 +425,24 @@ impl Workspace {
             .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    pub fn invite_user() {
-        unimplemented!();
+    pub fn invite_user(
+        &self,
+        session: &Session,
+        emails: Vec<String>,
+    ) -> Result<Vec<WorkspaceUser>, Error> {
+        let id = self
+            .id
+            .as_ref()
+            .ok_or_else(|| TogglError::from("Cannot invite users to a workspace that has no ID"))?;
+        let url = format!("workspaces/{}/invite", id);
+
+        let mut data: HashMap<String, Vec<String>> = HashMap::new();
+        data.insert("emails".to_string(), emails);
+
+        let mut resp =
+            http::post(&session, url, data).context("Failed to invite users to workspace")?;
+        let workspace_users: Vec<WorkspaceUser> = resp.json()?;
+        Ok(workspace_users)
     }
 }
 
