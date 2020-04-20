@@ -455,6 +455,7 @@ pub struct TimeEntryData {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct TimeEntry {
+    pub id: Option<String>,
     pub description: String,
     pub wid: Option<String>,
     pub pid: Option<String>,
@@ -470,17 +471,40 @@ pub struct TimeEntry {
 }
 
 impl TimeEntry {
-    pub fn get() {
-        unimplemented!();
+    pub fn get(session: &Session, id: &str) -> Result<Self, Error> {
+        let url = format!("time_entries/{}", id);
+        let mut resp = http::get(&session, url, vec![])
+            .context(format!("Failed to fetch time entry with ID {}", id))?;
+        resp.json().map_err(Error::from)
     }
 
-    // get between two dates
-    pub fn get_in_range() {
-        unimplemented!();
+    // todo: convert these to chrono dates to enforce format
+    pub fn get_in_range(
+        session: &Session,
+        start_date: &str,
+        end_date: &str,
+    ) -> Result<Self, Error> {
+        let url = "time_entries".to_string();
+        let mut resp = http::get(
+            &session,
+            url,
+            vec![
+                ("start_date".to_string(), start_date.to_string()),
+                ("end_date".to_string(), end_date.to_string()),
+            ],
+        )
+        .context(format!(
+            "Failed to fetch time entries between {} and {}",
+            start_date, end_date
+        ))?;
+        resp.json().map_err(Error::from)
     }
 
-    pub fn get_running() {
-        unimplemented!();
+    pub fn get_running(session: &Session) -> Result<Self, Error> {
+        let url = "time_entries/current".to_string();
+        let mut resp =
+            http::get(&session, url, vec![]).context("Failed to fetch current time entry")?;
+        resp.json().map_err(Error::from)
     }
 
     pub fn save() {
@@ -501,8 +525,15 @@ impl TimeEntry {
         unimplemented!();
     }
 
-    pub fn delete() {
-        unimplemented!();
+    pub fn delete(self, session: &Session) -> Result<bool, Error> {
+        let id = self
+            .id
+            .as_ref()
+            .ok_or_else(|| TogglError::from("Cannot delete time entry with no ID"))?;
+        let url = format!("time_entries/{}", id);
+        http::delete(session, url)
+            .map(|r| r.status().is_success())
+            .map_err(Error::from)
     }
 }
 
