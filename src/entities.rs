@@ -241,7 +241,7 @@ impl Project {
             .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    // Util function to create a default client from the given id.
+    // Util function to create a default project from the given id.
     // Note; no request to Toggl
     pub fn from_id(id: String) -> Self {
         let mut project = Project::default();
@@ -582,12 +582,12 @@ impl Group {
             .collect()
     }
 
-    // Util function to create a default client from the given id.
+    // Util function to create a default group from the given id.
     // Note; no request to Toggl
     pub fn from_id(id: String) -> Self {
-        let mut client = Group::default();
-        client.id = Some(id);
-        client
+        let mut group = Group::default();
+        group.id = Some(id);
+        group
     }
 }
 
@@ -619,12 +619,35 @@ impl ProjectUser {
         unimplemented!();
     }
 
-    pub fn delete() {
-        unimplemented!();
+    pub fn delete(self, session: &Session) -> Result<bool, Error> {
+        let id = self
+            .id
+            .as_ref()
+            .ok_or_else(|| TogglError::from("Cannot delete product user with no ID"))?;
+        let url = format!("project_users/{}", id);
+        http::delete(session, url)
+            .map(|r| r.status().is_success())
+            .map_err(Error::from)
     }
 
-    pub fn delete_by_ids() {
-        unimplemented!();
+    pub fn delete_by_ids(
+        self,
+        session: &Session,
+        ids: Vec<String>,
+    ) -> HashMap<String, Result<bool, Error>> {
+        // TODO: not totally sure what we should return here...was thinking just a
+        // Result<bool, Error> but that seems like it's too vague
+        ids.into_iter()
+            .map(|id| (id.clone(), ProjectUser::from_id(id).delete(session)))
+            .collect()
+    }
+
+    // Util function to create a default project user from the given id.
+    // Note; no request to Toggl
+    pub fn from_id(id: String) -> Self {
+        let mut project_user = ProjectUser::default();
+        project_user.id = Some(id);
+        project_user
     }
 
     pub fn create_in_project() {
