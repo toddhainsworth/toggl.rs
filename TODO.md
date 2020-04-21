@@ -5,4 +5,5 @@
 - Unit-testing
 - Some sort of universal fetcher to get rid of the association duplication
   - (eg. Workspace::projects implementation is duplicated _everywhere_)
-  - PRIOTIISE THIS
+  - PRIORITISE THIS
+  - Played around with a builder that creates the request but it got a little _too_ engineered...
