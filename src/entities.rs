@@ -674,12 +674,35 @@ impl Tag {
         unimplemented!();
     }
 
-    pub fn delete() {
-        unimplemented!();
+    pub fn delete(self, session: &Session) -> Result<bool, Error> {
+        let id = self
+            .id
+            .as_ref()
+            .ok_or_else(|| TogglError::from("Cannot delete tag with no ID"))?;
+        let url = format!("tags/{}", id);
+        http::delete(session, url)
+            .map(|r| r.status().is_success())
+            .map_err(Error::from)
     }
 
-    pub fn delete_by_ids() {
-        unimplemented!();
+    pub fn delete_by_ids(
+        self,
+        session: &Session,
+        ids: Vec<String>,
+    ) -> HashMap<String, Result<bool, Error>> {
+        // TODO: not totally sure what we should return here...was thinking just a
+        // Result<bool, Error> but that seems like it's too vague
+        ids.into_iter()
+            .map(|id| (id.clone(), Tag::from_id(id).delete(session)))
+            .collect()
+    }
+
+    // Util function to create a default tag from the given id.
+    // Note; no request to Toggl
+    pub fn from_id(id: String) -> Self {
+        let mut tag = Tag::default();
+        tag.id = Some(id);
+        tag
     }
 }
 
@@ -714,12 +737,35 @@ impl Task {
         unimplemented!();
     }
 
-    pub fn delete() {
-        unimplemented!();
+    pub fn delete(self, session: &Session) -> Result<bool, Error> {
+        let id = self
+            .id
+            .as_ref()
+            .ok_or_else(|| TogglError::from("Cannot delete task with no ID"))?;
+        let url = format!("tasks/{}", id);
+        http::delete(session, url)
+            .map(|r| r.status().is_success())
+            .map_err(Error::from)
     }
 
-    pub fn delete_by_ids() {
-        unimplemented!();
+    pub fn delete_by_ids(
+        self,
+        session: &Session,
+        ids: Vec<String>,
+    ) -> HashMap<String, Result<bool, Error>> {
+        // TODO: not totally sure what we should return here...was thinking just a
+        // Result<bool, Error> but that seems like it's too vague
+        ids.into_iter()
+            .map(|id| (id.clone(), Task::from_id(id).delete(session)))
+            .collect()
+    }
+
+    // Util function to create a default task from the given id.
+    // Note; no request to Toggl
+    pub fn from_id(id: String) -> Self {
+        let mut task = Task::default();
+        task.id = Some(id);
+        task
     }
 }
 
@@ -730,7 +776,13 @@ struct WorkspaceUserData {
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
-pub struct WorkspaceUser {}
+pub struct WorkspaceUser {
+    pub id: Option<String>,
+    pub uid: String,
+    pub admin: bool,
+    pub active: bool,
+    pub invite_url: Option<String>,
+}
 
 impl WorkspaceUser {
     pub fn save() {
@@ -738,11 +790,34 @@ impl WorkspaceUser {
         unimplemented!();
     }
 
-    pub fn delete() {
-        unimplemented!();
+    pub fn delete(self, session: &Session) -> Result<bool, Error> {
+        let id = self
+            .id
+            .as_ref()
+            .ok_or_else(|| TogglError::from("Cannot delete workspace user with no ID"))?;
+        let url = format!("workspace_users/{}", id);
+        http::delete(session, url)
+            .map(|r| r.status().is_success())
+            .map_err(Error::from)
     }
 
-    pub fn delete_by_id() {
-        unimplemented!();
+    pub fn delete_by_ids(
+        self,
+        session: &Session,
+        ids: Vec<String>,
+    ) -> HashMap<String, Result<bool, Error>> {
+        // TODO: not totally sure what we should return here...was thinking just a
+        // Result<bool, Error> but that seems like it's too vague
+        ids.into_iter()
+            .map(|id| (id.clone(), WorkspaceUser::from_id(id).delete(session)))
+            .collect()
+    }
+
+    // Util function to create a default workspace_user from the given id.
+    // Note; no request to Toggl
+    pub fn from_id(id: String) -> Self {
+        let mut workspace_user = WorkspaceUser::default();
+        workspace_user.id = Some(id);
+        workspace_user
     }
 }
