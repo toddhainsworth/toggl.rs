@@ -2,5 +2,6 @@
 **/*.rs.bk
 Cargo.lock
 .tags
+.DS_Store
  # using this to hold token for development
 .token
