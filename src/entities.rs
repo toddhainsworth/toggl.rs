@@ -196,16 +196,11 @@ impl Project {
             .map_err(Error::from)
     }
 
-    pub fn delete_by_ids(
-        self,
-        session: &Session,
-        ids: Vec<String>,
-    ) -> HashMap<String, Result<bool, Error>> {
+    pub fn delete_by_ids(self, session: &Session, ids: Vec<String>) -> Result<(), Error> {
         // TODO: not totally sure what we should return here...was thinking just a
         // Result<bool, Error> but that seems like it's too vague
-        ids.into_iter()
-            .map(|id| (id.clone(), Project::from_id(id).delete(session)))
-            .collect()
+        let url = format!("projects/{}", ids.join(","));
+        http::delete(session, url).map(|_| ()).map_err(Error::from)
     }
 
     pub fn users(&mut self, session: &Session) -> Result<&Vec<User>, Error> {
@@ -246,7 +241,7 @@ impl Project {
             .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    // Util function to create a default client from the given id.
+    // Util function to create a default project from the given id.
     // Note; no request to Toggl
     pub fn from_id(id: String) -> Self {
         let mut project = Project::default();
@@ -279,6 +274,7 @@ pub struct Workspace {
     pub projects: Option<Vec<Project>>,
     pub tasks: Option<Vec<Task>>,
     pub tags: Option<Vec<Tag>>,
+    pub clients: Option<Vec<Client>>,
     pub groups: Option<Vec<Group>>,
     pub project_users: Option<Vec<ProjectUser>>,
     pub workspace_users: Option<Vec<WorkspaceUser>>,
@@ -317,32 +313,136 @@ impl Workspace {
             .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    pub fn tasks() {
-        unimplemented!();
+    pub fn tasks(&mut self, session: &Session) -> Result<&Vec<Task>, Error> {
+        if self.tasks.is_none() {
+            let id = self
+                .id
+                .as_ref()
+                .ok_or_else(|| TogglError::from("Cannot get tasks for client with no ID"))?;
+
+            let url = format!("workspaces/{}/tasks", id);
+            let mut resp =
+                http::get(&session, url, Vec::new()).context("Failed to fetch workspace tasks")?;
+            let tasks: Vec<Task> = resp.json()?;
+            self.tasks = Some(tasks);
+        }
+        Ok(&self
+            .tasks
+            .as_ref()
+            .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    pub fn tags() {
-        unimplemented!();
+    pub fn tags(&mut self, session: &Session) -> Result<&Vec<Tag>, Error> {
+        if self.tags.is_none() {
+            let id = self
+                .id
+                .as_ref()
+                .ok_or_else(|| TogglError::from("Cannot get tags for client with no ID"))?;
+
+            let url = format!("workspaces/{}/tags", id);
+            let mut resp =
+                http::get(&session, url, Vec::new()).context("Failed to fetch workspace tags")?;
+            let tags: Vec<Tag> = resp.json()?;
+            self.tags = Some(tags);
+        }
+        Ok(&self
+            .tags
+            .as_ref()
+            .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    pub fn clients() {
-        unimplemented!();
+    pub fn clients(&mut self, session: &Session) -> Result<&Vec<Client>, Error> {
+        if self.clients.is_none() {
+            let id = self
+                .id
+                .as_ref()
+                .ok_or_else(|| TogglError::from("Cannot get clients for client with no ID"))?;
+
+            let url = format!("workspaces/{}/clients", id);
+            let mut resp = http::get(&session, url, Vec::new())
+                .context("Failed to fetch workspace clients")?;
+            let clients: Vec<Client> = resp.json()?;
+            self.clients = Some(clients);
+        }
+        Ok(&self
+            .clients
+            .as_ref()
+            .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    pub fn groups() {
-        unimplemented!();
+    pub fn groups(&mut self, session: &Session) -> Result<&Vec<Group>, Error> {
+        if self.groups.is_none() {
+            let id = self
+                .id
+                .as_ref()
+                .ok_or_else(|| TogglError::from("Cannot get groups for client with no ID"))?;
+
+            let url = format!("workspaces/{}/groups", id);
+            let mut resp =
+                http::get(&session, url, Vec::new()).context("Failed to fetch workspace groups")?;
+            let groups: Vec<Group> = resp.json()?;
+            self.groups = Some(groups);
+        }
+        Ok(&self
+            .groups
+            .as_ref()
+            .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    pub fn project_users() {
-        unimplemented!();
+    pub fn project_users(&mut self, session: &Session) -> Result<&Vec<ProjectUser>, Error> {
+        if self.project_users.is_none() {
+            let id = self.id.as_ref().ok_or_else(|| {
+                TogglError::from("Cannot get project users for client with no ID")
+            })?;
+
+            let url = format!("workspaces/{}/project_users", id);
+            let mut resp = http::get(&session, url, Vec::new())
+                .context("Failed to fetch workspace project_users")?;
+            let project_users: Vec<ProjectUser> = resp.json()?;
+            self.project_users = Some(project_users);
+        }
+        Ok(&self
+            .project_users
+            .as_ref()
+            .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    pub fn workspace_users() {
-        unimplemented!();
+    pub fn workspace_users(&mut self, session: &Session) -> Result<&Vec<WorkspaceUser>, Error> {
+        if self.workspace_users.is_none() {
+            let id = self.id.as_ref().ok_or_else(|| {
+                TogglError::from("Cannot get workspace users for client with no ID")
+            })?;
+
+            let url = format!("workspaces/{}/workspace_users", id);
+            let mut resp = http::get(&session, url, Vec::new())
+                .context("Failed to fetch workspace workspace_users")?;
+            let workspace_users: Vec<WorkspaceUser> = resp.json()?;
+            self.workspace_users = Some(workspace_users);
+        }
+        Ok(&self
+            .workspace_users
+            .as_ref()
+            .expect("Okay to unwrap because we ensure it's atleast an empty array"))
     }
 
-    pub fn invite_user() {
-        unimplemented!();
+    pub fn invite_user(
+        &self,
+        session: &Session,
+        emails: Vec<String>,
+    ) -> Result<Vec<WorkspaceUser>, Error> {
+        let id = self
+            .id
+            .as_ref()
+            .ok_or_else(|| TogglError::from("Cannot invite users to a workspace that has no ID"))?;
+        let url = format!("workspaces/{}/invite", id);
+
+        let mut data: HashMap<String, Vec<String>> = HashMap::new();
+        data.insert("emails".to_string(), emails);
+
+        let mut resp =
+            http::post(&session, url, data).context("Failed to invite users to workspace")?;
+        let workspace_users: Vec<WorkspaceUser> = resp.json()?;
+        Ok(workspace_users)
     }
 }
 
@@ -355,6 +455,7 @@ pub struct TimeEntryData {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct TimeEntry {
+    pub id: Option<String>,
     pub description: String,
     pub wid: Option<String>,
     pub pid: Option<String>,
@@ -370,17 +471,40 @@ pub struct TimeEntry {
 }
 
 impl TimeEntry {
-    pub fn get() {
-        unimplemented!();
+    pub fn get(session: &Session, id: &str) -> Result<Self, Error> {
+        let url = format!("time_entries/{}", id);
+        let mut resp = http::get(&session, url, vec![])
+            .context(format!("Failed to fetch time entry with ID {}", id))?;
+        resp.json().map_err(Error::from)
     }
 
-    // get between two dates
-    pub fn get_in_range() {
-        unimplemented!();
+    // todo: convert these to chrono dates to enforce format
+    pub fn get_in_range(
+        session: &Session,
+        start_date: &str,
+        end_date: &str,
+    ) -> Result<Self, Error> {
+        let url = "time_entries".to_string();
+        let mut resp = http::get(
+            &session,
+            url,
+            vec![
+                ("start_date".to_string(), start_date.to_string()),
+                ("end_date".to_string(), end_date.to_string()),
+            ],
+        )
+        .context(format!(
+            "Failed to fetch time entries between {} and {}",
+            start_date, end_date
+        ))?;
+        resp.json().map_err(Error::from)
     }
 
-    pub fn get_running() {
-        unimplemented!();
+    pub fn get_running(session: &Session) -> Result<Self, Error> {
+        let url = "time_entries/current".to_string();
+        let mut resp =
+            http::get(&session, url, vec![]).context("Failed to fetch current time entry")?;
+        resp.json().map_err(Error::from)
     }
 
     pub fn save() {
@@ -401,8 +525,15 @@ impl TimeEntry {
         unimplemented!();
     }
 
-    pub fn delete() {
-        unimplemented!();
+    pub fn delete(self, session: &Session) -> Result<bool, Error> {
+        let id = self
+            .id
+            .as_ref()
+            .ok_or_else(|| TogglError::from("Cannot delete time entry with no ID"))?;
+        let url = format!("time_entries/{}", id);
+        http::delete(session, url)
+            .map(|r| r.status().is_success())
+            .map_err(Error::from)
     }
 }
 
@@ -428,12 +559,35 @@ impl Group {
         unimplemented!();
     }
 
-    pub fn delete() {
-        unimplemented!();
+    pub fn delete(self, session: &Session) -> Result<bool, Error> {
+        let id = self
+            .id
+            .as_ref()
+            .ok_or_else(|| TogglError::from("Cannot delete group with no ID"))?;
+        let url = format!("groups/{}", id);
+        http::delete(session, url)
+            .map(|r| r.status().is_success())
+            .map_err(Error::from)
     }
 
-    pub fn delete_by_ids() {
-        unimplemented!();
+    pub fn delete_by_ids(
+        self,
+        session: &Session,
+        ids: Vec<String>,
+    ) -> HashMap<String, Result<bool, Error>> {
+        // TODO: not totally sure what we should return here...was thinking just a
+        // Result<bool, Error> but that seems like it's too vague
+        ids.into_iter()
+            .map(|id| (id.clone(), Group::from_id(id).delete(session)))
+            .collect()
+    }
+
+    // Util function to create a default group from the given id.
+    // Note; no request to Toggl
+    pub fn from_id(id: String) -> Self {
+        let mut group = Group::default();
+        group.id = Some(id);
+        group
     }
 }
 
@@ -465,12 +619,35 @@ impl ProjectUser {
         unimplemented!();
     }
 
-    pub fn delete() {
-        unimplemented!();
+    pub fn delete(self, session: &Session) -> Result<bool, Error> {
+        let id = self
+            .id
+            .as_ref()
+            .ok_or_else(|| TogglError::from("Cannot delete product user with no ID"))?;
+        let url = format!("project_users/{}", id);
+        http::delete(session, url)
+            .map(|r| r.status().is_success())
+            .map_err(Error::from)
     }
 
-    pub fn delete_by_ids() {
-        unimplemented!();
+    pub fn delete_by_ids(
+        self,
+        session: &Session,
+        ids: Vec<String>,
+    ) -> HashMap<String, Result<bool, Error>> {
+        // TODO: not totally sure what we should return here...was thinking just a
+        // Result<bool, Error> but that seems like it's too vague
+        ids.into_iter()
+            .map(|id| (id.clone(), ProjectUser::from_id(id).delete(session)))
+            .collect()
+    }
+
+    // Util function to create a default project user from the given id.
+    // Note; no request to Toggl
+    pub fn from_id(id: String) -> Self {
+        let mut project_user = ProjectUser::default();
+        project_user.id = Some(id);
+        project_user
     }
 
     pub fn create_in_project() {
@@ -497,12 +674,35 @@ impl Tag {
         unimplemented!();
     }
 
-    pub fn delete() {
-        unimplemented!();
+    pub fn delete(self, session: &Session) -> Result<bool, Error> {
+        let id = self
+            .id
+            .as_ref()
+            .ok_or_else(|| TogglError::from("Cannot delete tag with no ID"))?;
+        let url = format!("tags/{}", id);
+        http::delete(session, url)
+            .map(|r| r.status().is_success())
+            .map_err(Error::from)
     }
 
-    pub fn delete_by_ids() {
-        unimplemented!();
+    pub fn delete_by_ids(
+        self,
+        session: &Session,
+        ids: Vec<String>,
+    ) -> HashMap<String, Result<bool, Error>> {
+        // TODO: not totally sure what we should return here...was thinking just a
+        // Result<bool, Error> but that seems like it's too vague
+        ids.into_iter()
+            .map(|id| (id.clone(), Tag::from_id(id).delete(session)))
+            .collect()
+    }
+
+    // Util function to create a default tag from the given id.
+    // Note; no request to Toggl
+    pub fn from_id(id: String) -> Self {
+        let mut tag = Tag::default();
+        tag.id = Some(id);
+        tag
     }
 }
 
@@ -537,12 +737,35 @@ impl Task {
         unimplemented!();
     }
 
-    pub fn delete() {
-        unimplemented!();
+    pub fn delete(self, session: &Session) -> Result<bool, Error> {
+        let id = self
+            .id
+            .as_ref()
+            .ok_or_else(|| TogglError::from("Cannot delete task with no ID"))?;
+        let url = format!("tasks/{}", id);
+        http::delete(session, url)
+            .map(|r| r.status().is_success())
+            .map_err(Error::from)
     }
 
-    pub fn delete_by_ids() {
-        unimplemented!();
+    pub fn delete_by_ids(
+        self,
+        session: &Session,
+        ids: Vec<String>,
+    ) -> HashMap<String, Result<bool, Error>> {
+        // TODO: not totally sure what we should return here...was thinking just a
+        // Result<bool, Error> but that seems like it's too vague
+        ids.into_iter()
+            .map(|id| (id.clone(), Task::from_id(id).delete(session)))
+            .collect()
+    }
+
+    // Util function to create a default task from the given id.
+    // Note; no request to Toggl
+    pub fn from_id(id: String) -> Self {
+        let mut task = Task::default();
+        task.id = Some(id);
+        task
     }
 }
 
@@ -553,7 +776,13 @@ struct WorkspaceUserData {
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
-pub struct WorkspaceUser {}
+pub struct WorkspaceUser {
+    pub id: Option<String>,
+    pub uid: String,
+    pub admin: bool,
+    pub active: bool,
+    pub invite_url: Option<String>,
+}
 
 impl WorkspaceUser {
     pub fn save() {
@@ -561,11 +790,34 @@ impl WorkspaceUser {
         unimplemented!();
     }
 
-    pub fn delete() {
-        unimplemented!();
+    pub fn delete(self, session: &Session) -> Result<bool, Error> {
+        let id = self
+            .id
+            .as_ref()
+            .ok_or_else(|| TogglError::from("Cannot delete workspace user with no ID"))?;
+        let url = format!("workspace_users/{}", id);
+        http::delete(session, url)
+            .map(|r| r.status().is_success())
+            .map_err(Error::from)
     }
 
-    pub fn delete_by_id() {
-        unimplemented!();
+    pub fn delete_by_ids(
+        self,
+        session: &Session,
+        ids: Vec<String>,
+    ) -> HashMap<String, Result<bool, Error>> {
+        // TODO: not totally sure what we should return here...was thinking just a
+        // Result<bool, Error> but that seems like it's too vague
+        ids.into_iter()
+            .map(|id| (id.clone(), WorkspaceUser::from_id(id).delete(session)))
+            .collect()
+    }
+
+    // Util function to create a default workspace_user from the given id.
+    // Note; no request to Toggl
+    pub fn from_id(id: String) -> Self {
+        let mut workspace_user = WorkspaceUser::default();
+        workspace_user.id = Some(id);
+        workspace_user
     }
 }
