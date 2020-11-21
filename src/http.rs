@@ -7,7 +7,7 @@ use reqwest::{Client, Response, Result};
 use serde::Serialize;
 use std::collections::HashMap;
 
-const TOGGL_API_BASE: &str = "https://www.toggl.com/api/v8";
+const TOGGL_API_BASE: &str = "https://api.track.toggl.com/api/v8";
 
 #[allow(dead_code)]
 pub fn get(session: &Session, url: String, params: Vec<(String, String)>) -> Result<Response> {
@@ -15,6 +15,7 @@ pub fn get(session: &Session, url: String, params: Vec<(String, String)>) -> Res
     let client = Client::new();
     client
         .get(&full_url)
+        .header("Authorization", format!("Bearer {}", session.auth_string()))
         .basic_auth(&session.api_key, Some("api_token"))
         .query(&params)
         .send()
