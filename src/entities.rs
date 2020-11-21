@@ -16,7 +16,7 @@ struct UserData {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct User {
-    pub id: Option<String>,
+    pub id: Option<usize>,
     pub api_token: String,
     pub default_wid: usize,
     pub email: String,
@@ -31,7 +31,7 @@ pub struct User {
     pub image_url: String,
     pub sidebar_piechart: bool,
     pub at: Option<String>, // TODO: make me a chrono::DateTime
-    pub new_blog_post: HashMap<String, String>, // TODO
+    pub new_blog_post: Option<HashMap<String, String>>, // TODO
     pub send_product_emails: bool,
     pub send_timer_notifications: bool,
     pub openid_enabled: bool,
@@ -71,7 +71,7 @@ struct ClientData {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Client {
-    pub id: Option<String>,
+    pub id: Option<usize>,
     pub name: String,
     pub wid: Option<usize>,
     pub notes: Option<String>,
@@ -132,8 +132,8 @@ impl Client {
     pub fn delete_by_ids(
         self,
         session: &Session,
-        ids: Vec<String>,
-    ) -> HashMap<String, Result<bool, Error>> {
+        ids: Vec<usize>,
+    ) -> HashMap<usize, Result<bool, Error>> {
         // TODO: not totally sure what we should return here...was thinking just a
         // Result<bool, Error> but that seems like it's too vague
         ids.into_iter()
@@ -143,7 +143,7 @@ impl Client {
 
     // Util function to create a default client from the given id.
     // Note; no request to Toggl
-    pub fn from_id(id: String) -> Self {
+    pub fn from_id(id: usize) -> Self {
         let mut client = Client::default();
         client.id = Some(id);
         client
@@ -158,9 +158,9 @@ struct ProjectData {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Project {
-    pub id: Option<String>,
-    pub wid: Option<String>,
-    pub cid: Option<String>,
+    pub id: Option<usize>,
+    pub wid: Option<usize>,
+    pub cid: Option<usize>,
     pub name: String,
     pub billable: bool,
     pub is_private: bool,
@@ -243,7 +243,7 @@ impl Project {
 
     // Util function to create a default project from the given id.
     // Note; no request to Toggl
-    pub fn from_id(id: String) -> Self {
+    pub fn from_id(id: usize) -> Self {
         let mut project = Project::default();
         project.id = Some(id);
         project
@@ -259,7 +259,7 @@ struct WorkspaceData {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Workspace {
-    pub id: Option<String>,
+    pub id: Option<usize>,
     pub name: String,
     pub premium: bool,
     pub admin: bool,
@@ -455,11 +455,11 @@ pub struct TimeEntryData {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct TimeEntry {
-    pub id: Option<String>,
+    pub id: Option<usize>,
     pub description: String,
-    pub wid: Option<String>,
-    pub pid: Option<String>,
-    pub tid: Option<String>,
+    pub wid: Option<usize>,
+    pub pid: Option<usize>,
+    pub tid: Option<usize>,
     pub billable: bool,
     pub start: String,
     pub stop: Option<String>,
@@ -546,9 +546,9 @@ pub struct GroupData {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Group {
-    pub id: Option<String>,
+    pub id: Option<usize>,
     pub name: String,
-    pub wid: String,
+    pub wid: usize,
     pub at: Option<String>, // TODO: chronos::DateTime
 }
 
@@ -573,8 +573,8 @@ impl Group {
     pub fn delete_by_ids(
         self,
         session: &Session,
-        ids: Vec<String>,
-    ) -> HashMap<String, Result<bool, Error>> {
+        ids: Vec<usize>,
+    ) -> HashMap<usize, Result<bool, Error>> {
         // TODO: not totally sure what we should return here...was thinking just a
         // Result<bool, Error> but that seems like it's too vague
         ids.into_iter()
@@ -584,7 +584,7 @@ impl Group {
 
     // Util function to create a default group from the given id.
     // Note; no request to Toggl
-    pub fn from_id(id: String) -> Self {
+    pub fn from_id(id: usize) -> Self {
         let mut group = Group::default();
         group.id = Some(id);
         group
@@ -599,10 +599,10 @@ struct ProjectUsersData {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct ProjectUser {
-    pub id: Option<String>,
-    pub pid: String,
-    pub uid: String,
-    pub wid: Option<String>,
+    pub id: Option<usize>,
+    pub pid: usize,
+    pub uid: usize,
+    pub wid: Option<usize>,
     pub manager: bool,
     pub rate: f64,
     pub at: Option<String>,
@@ -633,8 +633,8 @@ impl ProjectUser {
     pub fn delete_by_ids(
         self,
         session: &Session,
-        ids: Vec<String>,
-    ) -> HashMap<String, Result<bool, Error>> {
+        ids: Vec<usize>,
+    ) -> HashMap<usize, Result<bool, Error>> {
         // TODO: not totally sure what we should return here...was thinking just a
         // Result<bool, Error> but that seems like it's too vague
         ids.into_iter()
@@ -644,7 +644,7 @@ impl ProjectUser {
 
     // Util function to create a default project user from the given id.
     // Note; no request to Toggl
-    pub fn from_id(id: String) -> Self {
+    pub fn from_id(id: usize) -> Self {
         let mut project_user = ProjectUser::default();
         project_user.id = Some(id);
         project_user
@@ -663,8 +663,8 @@ struct TagData {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Tag {
-    id: Option<String>,
-    wid: String,
+    id: Option<usize>,
+    wid: usize,
     name: String,
 }
 
@@ -688,8 +688,8 @@ impl Tag {
     pub fn delete_by_ids(
         self,
         session: &Session,
-        ids: Vec<String>,
-    ) -> HashMap<String, Result<bool, Error>> {
+        ids: Vec<usize>,
+    ) -> HashMap<usize, Result<bool, Error>> {
         // TODO: not totally sure what we should return here...was thinking just a
         // Result<bool, Error> but that seems like it's too vague
         ids.into_iter()
@@ -699,7 +699,7 @@ impl Tag {
 
     // Util function to create a default tag from the given id.
     // Note; no request to Toggl
-    pub fn from_id(id: String) -> Self {
+    pub fn from_id(id: usize) -> Self {
         let mut tag = Tag::default();
         tag.id = Some(id);
         tag
@@ -714,10 +714,10 @@ struct TaskData {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Task {
-    pub id: Option<String>,
+    pub id: Option<usize>,
     pub name: String,
-    pub wid: Option<String>,
-    pub pid: String,
+    pub wid: Option<usize>,
+    pub pid: usize,
     pub active: bool,
     pub estimated_seconds: usize,
 }
@@ -751,8 +751,8 @@ impl Task {
     pub fn delete_by_ids(
         self,
         session: &Session,
-        ids: Vec<String>,
-    ) -> HashMap<String, Result<bool, Error>> {
+        ids: Vec<usize>,
+    ) -> HashMap<usize, Result<bool, Error>> {
         // TODO: not totally sure what we should return here...was thinking just a
         // Result<bool, Error> but that seems like it's too vague
         ids.into_iter()
@@ -762,7 +762,7 @@ impl Task {
 
     // Util function to create a default task from the given id.
     // Note; no request to Toggl
-    pub fn from_id(id: String) -> Self {
+    pub fn from_id(id: usize) -> Self {
         let mut task = Task::default();
         task.id = Some(id);
         task
@@ -777,8 +777,8 @@ struct WorkspaceUserData {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct WorkspaceUser {
-    pub id: Option<String>,
-    pub uid: String,
+    pub id: Option<usize>,
+    pub uid: usize,
     pub admin: bool,
     pub active: bool,
     pub invite_url: Option<String>,
@@ -804,8 +804,8 @@ impl WorkspaceUser {
     pub fn delete_by_ids(
         self,
         session: &Session,
-        ids: Vec<String>,
-    ) -> HashMap<String, Result<bool, Error>> {
+        ids: Vec<usize>,
+    ) -> HashMap<usize, Result<bool, Error>> {
         // TODO: not totally sure what we should return here...was thinking just a
         // Result<bool, Error> but that seems like it's too vague
         ids.into_iter()
@@ -815,7 +815,7 @@ impl WorkspaceUser {
 
     // Util function to create a default workspace_user from the given id.
     // Note; no request to Toggl
-    pub fn from_id(id: String) -> Self {
+    pub fn from_id(id: usize) -> Self {
         let mut workspace_user = WorkspaceUser::default();
         workspace_user.id = Some(id);
         workspace_user
