@@ -82,7 +82,7 @@ pub struct Client {
 impl Client {
     // TOOD: Write a test that doesn't hit the API for me :)
     pub fn all(session: &Session) -> Result<Vec<Self>, Error> {
-        let mut resp = http::get(&session, "clients".to_string(), Vec::new())
+        let mut resp = http::get(session, "clients".to_string(), Vec::new())
             .context("Failed to fetch clients for this user")?;
         resp.json().map_err(Error::from)
     }
@@ -90,7 +90,7 @@ impl Client {
     // TOOD: Write a test that doesn't hit the API for me :)
     pub fn get(session: &Session, id: &str) -> Result<Self, Error> {
         let url = format!("clients/{}", id);
-        let mut resp = http::get(&session, url, vec![])
+        let mut resp = http::get(session, url, vec![])
             .context(format!("Failed to fetch client with ID {}", id))?;
         resp.json().map_err(Error::from)
     }
@@ -104,10 +104,10 @@ impl Client {
 
             let url = format!("clients/{}/projects", id);
             let mut resp =
-                http::get(&session, url, Vec::new()).context("Failed to fetch client projects")?;
+                http::get(session, url, Vec::new()).context("Failed to fetch client projects")?;
             self.projects = resp.json()?;
         }
-        Ok(&self
+        Ok(self
             .projects
             .as_ref()
             .expect("Okay to unwrap because we ensure it's atleast an empty array"))
@@ -137,16 +137,17 @@ impl Client {
         // TODO: not totally sure what we should return here...was thinking just a
         // Result<bool, Error> but that seems like it's too vague
         ids.into_iter()
-            .map(|id| (id.clone(), Client::from_id(id).delete(session)))
+            .map(|id| (id, Client::from_id(id).delete(session)))
             .collect()
     }
 
     // Util function to create a default client from the given id.
     // Note; no request to Toggl
     pub fn from_id(id: usize) -> Self {
-        let mut client = Client::default();
-        client.id = Some(id);
-        client
+        Client {
+            id: Some(id),
+            ..Client::default()
+        }
     }
 }
 
@@ -175,7 +176,7 @@ pub struct Project {
 impl Project {
     pub fn get(session: &Session, id: &str) -> Result<Self, Error> {
         let url = format!("projects/{}", id);
-        let mut resp = http::get(&session, url, Vec::new()).context("Failed to fetch project")?;
+        let mut resp = http::get(session, url, Vec::new()).context("Failed to fetch project")?;
         let body: ProjectData = resp.json().context("Failed to parse Project from JSON")?;
         Ok(body.data)
     }
@@ -212,11 +213,11 @@ impl Project {
 
             let url = format!("projects/{}/users", id);
             let mut resp =
-                http::get(&session, url, Vec::new()).context("Failed to fetch project users")?;
+                http::get(session, url, Vec::new()).context("Failed to fetch project users")?;
             let users: Vec<User> = resp.json()?;
             self.users = Some(users);
         }
-        Ok(&self
+        Ok(self
             .users
             .as_ref()
             .expect("Okay to unwrap because we ensure it's atleast an empty array"))
@@ -231,11 +232,11 @@ impl Project {
 
             let url = format!("projects/{}/tasks", id);
             let mut resp =
-                http::get(&session, url, Vec::new()).context("Failed to fetch project tasks")?;
+                http::get(session, url, Vec::new()).context("Failed to fetch project tasks")?;
             let tasks: Vec<Task> = resp.json()?;
             self.tasks = Some(tasks);
         }
-        Ok(&self
+        Ok(self
             .tasks
             .as_ref()
             .expect("Okay to unwrap because we ensure it's atleast an empty array"))
@@ -244,9 +245,10 @@ impl Project {
     // Util function to create a default project from the given id.
     // Note; no request to Toggl
     pub fn from_id(id: usize) -> Self {
-        let mut project = Project::default();
-        project.id = Some(id);
-        project
+        Project {
+            id: Some(id),
+            ..Default::default()
+        }
     }
 }
 
@@ -282,14 +284,14 @@ pub struct Workspace {
 
 impl Workspace {
     pub fn all(session: &Session) -> Result<Vec<Self>, Error> {
-        let mut resp = http::get(&session, "workspaces".to_string(), Vec::new())
+        let mut resp = http::get(session, "workspaces".to_string(), Vec::new())
             .context("Failed to fetch all workspaces")?;
         resp.json().map_err(Error::from)
     }
 
     pub fn get(session: &Session, id: &str) -> Result<Self, Error> {
         let url = format!("workspaces/{}", id);
-        let mut resp = http::get(&session, url, Vec::new()).context("Failed to fetch workspace")?;
+        let mut resp = http::get(session, url, Vec::new()).context("Failed to fetch workspace")?;
         let body: WorkspaceData = resp.json().context("Failed to parse workspace from JSON")?;
         Ok(body.data)
     }
@@ -302,12 +304,12 @@ impl Workspace {
                 .ok_or_else(|| TogglError::from("Cannot get projects for client with no ID"))?;
 
             let url = format!("workspaces/{}/projects", id);
-            let mut resp = http::get(&session, url, Vec::new())
+            let mut resp = http::get(session, url, Vec::new())
                 .context("Failed to fetch workspace projects")?;
             let projects: Vec<Project> = resp.json()?;
             self.projects = Some(projects);
         }
-        Ok(&self
+        Ok(self
             .projects
             .as_ref()
             .expect("Okay to unwrap because we ensure it's atleast an empty array"))
@@ -322,11 +324,11 @@ impl Workspace {
 
             let url = format!("workspaces/{}/tasks", id);
             let mut resp =
-                http::get(&session, url, Vec::new()).context("Failed to fetch workspace tasks")?;
+                http::get(session, url, Vec::new()).context("Failed to fetch workspace tasks")?;
             let tasks: Vec<Task> = resp.json()?;
             self.tasks = Some(tasks);
         }
-        Ok(&self
+        Ok(self
             .tasks
             .as_ref()
             .expect("Okay to unwrap because we ensure it's atleast an empty array"))
@@ -341,11 +343,11 @@ impl Workspace {
 
             let url = format!("workspaces/{}/tags", id);
             let mut resp =
-                http::get(&session, url, Vec::new()).context("Failed to fetch workspace tags")?;
+                http::get(session, url, Vec::new()).context("Failed to fetch workspace tags")?;
             let tags: Vec<Tag> = resp.json()?;
             self.tags = Some(tags);
         }
-        Ok(&self
+        Ok(self
             .tags
             .as_ref()
             .expect("Okay to unwrap because we ensure it's atleast an empty array"))
@@ -359,12 +361,12 @@ impl Workspace {
                 .ok_or_else(|| TogglError::from("Cannot get clients for client with no ID"))?;
 
             let url = format!("workspaces/{}/clients", id);
-            let mut resp = http::get(&session, url, Vec::new())
-                .context("Failed to fetch workspace clients")?;
+            let mut resp =
+                http::get(session, url, Vec::new()).context("Failed to fetch workspace clients")?;
             let clients: Vec<Client> = resp.json()?;
             self.clients = Some(clients);
         }
-        Ok(&self
+        Ok(self
             .clients
             .as_ref()
             .expect("Okay to unwrap because we ensure it's atleast an empty array"))
@@ -379,11 +381,11 @@ impl Workspace {
 
             let url = format!("workspaces/{}/groups", id);
             let mut resp =
-                http::get(&session, url, Vec::new()).context("Failed to fetch workspace groups")?;
+                http::get(session, url, Vec::new()).context("Failed to fetch workspace groups")?;
             let groups: Vec<Group> = resp.json()?;
             self.groups = Some(groups);
         }
-        Ok(&self
+        Ok(self
             .groups
             .as_ref()
             .expect("Okay to unwrap because we ensure it's atleast an empty array"))
@@ -396,12 +398,12 @@ impl Workspace {
             })?;
 
             let url = format!("workspaces/{}/project_users", id);
-            let mut resp = http::get(&session, url, Vec::new())
+            let mut resp = http::get(session, url, Vec::new())
                 .context("Failed to fetch workspace project_users")?;
             let project_users: Vec<ProjectUser> = resp.json()?;
             self.project_users = Some(project_users);
         }
-        Ok(&self
+        Ok(self
             .project_users
             .as_ref()
             .expect("Okay to unwrap because we ensure it's atleast an empty array"))
@@ -414,12 +416,12 @@ impl Workspace {
             })?;
 
             let url = format!("workspaces/{}/workspace_users", id);
-            let mut resp = http::get(&session, url, Vec::new())
+            let mut resp = http::get(session, url, Vec::new())
                 .context("Failed to fetch workspace workspace_users")?;
             let workspace_users: Vec<WorkspaceUser> = resp.json()?;
             self.workspace_users = Some(workspace_users);
         }
-        Ok(&self
+        Ok(self
             .workspace_users
             .as_ref()
             .expect("Okay to unwrap because we ensure it's atleast an empty array"))
@@ -440,7 +442,7 @@ impl Workspace {
         data.insert("emails".to_string(), emails);
 
         let mut resp =
-            http::post(&session, url, data).context("Failed to invite users to workspace")?;
+            http::post(session, url, data).context("Failed to invite users to workspace")?;
         let workspace_users: Vec<WorkspaceUser> = resp.json()?;
         Ok(workspace_users)
     }
@@ -473,7 +475,7 @@ pub struct TimeEntry {
 impl TimeEntry {
     pub fn get(session: &Session, id: &str) -> Result<Self, Error> {
         let url = format!("time_entries/{}", id);
-        let mut resp = http::get(&session, url, vec![])
+        let mut resp = http::get(session, url, vec![])
             .context(format!("Failed to fetch time entry with ID {}", id))?;
         resp.json().map_err(Error::from)
     }
@@ -486,7 +488,7 @@ impl TimeEntry {
     ) -> Result<Self, Error> {
         let url = "time_entries".to_string();
         let mut resp = http::get(
-            &session,
+            session,
             url,
             vec![
                 ("start_date".to_string(), start_date.to_string()),
@@ -503,7 +505,7 @@ impl TimeEntry {
     pub fn get_running(session: &Session) -> Result<Self, Error> {
         let url = "time_entries/current".to_string();
         let mut resp =
-            http::get(&session, url, vec![]).context("Failed to fetch current time entry")?;
+            http::get(session, url, vec![]).context("Failed to fetch current time entry")?;
         resp.json().map_err(Error::from)
     }
 
@@ -578,16 +580,17 @@ impl Group {
         // TODO: not totally sure what we should return here...was thinking just a
         // Result<bool, Error> but that seems like it's too vague
         ids.into_iter()
-            .map(|id| (id.clone(), Group::from_id(id).delete(session)))
+            .map(|id| (id, Group::from_id(id).delete(session)))
             .collect()
     }
 
     // Util function to create a default group from the given id.
     // Note; no request to Toggl
     pub fn from_id(id: usize) -> Self {
-        let mut group = Group::default();
-        group.id = Some(id);
-        group
+        Group {
+            id: Some(id),
+            ..Default::default()
+        }
     }
 }
 
@@ -638,16 +641,17 @@ impl ProjectUser {
         // TODO: not totally sure what we should return here...was thinking just a
         // Result<bool, Error> but that seems like it's too vague
         ids.into_iter()
-            .map(|id| (id.clone(), ProjectUser::from_id(id).delete(session)))
+            .map(|id| (id, ProjectUser::from_id(id).delete(session)))
             .collect()
     }
 
     // Util function to create a default project user from the given id.
     // Note; no request to Toggl
     pub fn from_id(id: usize) -> Self {
-        let mut project_user = ProjectUser::default();
-        project_user.id = Some(id);
-        project_user
+        ProjectUser {
+            id: Some(id),
+            ..Default::default()
+        }
     }
 
     pub fn create_in_project() {
@@ -693,16 +697,17 @@ impl Tag {
         // TODO: not totally sure what we should return here...was thinking just a
         // Result<bool, Error> but that seems like it's too vague
         ids.into_iter()
-            .map(|id| (id.clone(), Tag::from_id(id).delete(session)))
+            .map(|id| (id, Tag::from_id(id).delete(session)))
             .collect()
     }
 
     // Util function to create a default tag from the given id.
     // Note; no request to Toggl
     pub fn from_id(id: usize) -> Self {
-        let mut tag = Tag::default();
-        tag.id = Some(id);
-        tag
+        Tag {
+            id: Some(id),
+            ..Default::default()
+        }
     }
 }
 
@@ -756,16 +761,17 @@ impl Task {
         // TODO: not totally sure what we should return here...was thinking just a
         // Result<bool, Error> but that seems like it's too vague
         ids.into_iter()
-            .map(|id| (id.clone(), Task::from_id(id).delete(session)))
+            .map(|id| (id, Task::from_id(id).delete(session)))
             .collect()
     }
 
     // Util function to create a default task from the given id.
     // Note; no request to Toggl
     pub fn from_id(id: usize) -> Self {
-        let mut task = Task::default();
-        task.id = Some(id);
-        task
+        Task {
+            id: Some(id),
+            ..Default::default()
+        }
     }
 }
 
@@ -809,15 +815,16 @@ impl WorkspaceUser {
         // TODO: not totally sure what we should return here...was thinking just a
         // Result<bool, Error> but that seems like it's too vague
         ids.into_iter()
-            .map(|id| (id.clone(), WorkspaceUser::from_id(id).delete(session)))
+            .map(|id| (id, WorkspaceUser::from_id(id).delete(session)))
             .collect()
     }
 
     // Util function to create a default workspace_user from the given id.
     // Note; no request to Toggl
     pub fn from_id(id: usize) -> Self {
-        let mut workspace_user = WorkspaceUser::default();
-        workspace_user.id = Some(id);
-        workspace_user
+        WorkspaceUser {
+            id: Some(id),
+            ..Default::default()
+        }
     }
 }
